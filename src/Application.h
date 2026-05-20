@@ -21,11 +21,13 @@ public:
         _gameWindow = ProcessHelper::getRenderingWindow(_gamePid);
         if (_gameWindow == nullptr) {
             MessageBoxA(NULL, "Could not find dofus rendering window", "Error", MB_OK | MB_ICONERROR);
+            return;
         }
         Logger::info("Found Dofus.exe [pid={}]", _gamePid);
 
         if (!retrieveObjectManager()) {
             MessageBoxA(NULL, "Could not locate GameObjectManager", "Error", MB_OK | MB_ICONERROR);
+            return;
         }
 
         Logger::info("Located GameObjectManager successfully");
