@@ -1,10 +1,6 @@
 #pragma once
 #include <chrono>
 #include <cstdint>
-
-#pragma once
-#include <chrono>
-#include <cstdint>
 #include <utility>
 
 class PeriodicAsyncTimer {
