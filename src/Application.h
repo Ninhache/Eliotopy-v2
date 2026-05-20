@@ -6,6 +6,9 @@
 #include "Resolve6.hpp"
 #include "DataStore.h"
 #include "PeriodicAsyncTimer.h"
+#include <timeapi.h>
+
+#pragma comment(lib, "winmm.lib")
 
 class Application {
 public:
@@ -67,7 +70,10 @@ private:
     }
 
     void run() {
+        timeBeginPeriod(1);
+
         while (!_exit) {
+            TimeElapsedScopeLogger logger("main loop");
             if (!IsWindow(_gameWindow))
                 break;
 
