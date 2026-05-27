@@ -33,8 +33,13 @@ inline void to_json(nlohmann::json& j, const GameState& g) {
     auto fightEntitiesJson = nlohmann::json::array();
     for (const auto& [id, entity] : g.fightEntities) fightEntitiesJson.push_back(entity);
 
-    auto portalsJson = nlohmann::json::array();
-    for (const auto& [id, portal] : g.portalEntities) portalsJson.push_back(portal);
+    std::vector<PortalState> sortedPortals(g.portalEntities.size());
+    for (const auto& [id, portal] : g.portalEntities) {
+        if (portal.index > 0 && portal.index <= sortedPortals.size()) {
+            sortedPortals[portal.index - 1] = portal;
+        }
+    }
+    auto portalsJson = nlohmann::json(sortedPortals);
 
     j = nlohmann::json{
         {"isInGame", g.isInGame},

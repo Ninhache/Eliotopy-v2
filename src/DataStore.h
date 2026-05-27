@@ -175,20 +175,24 @@ public:
                 if (it != teamsMap.end()) {
                     entityState.teamId = it->second;
                 }
-                
-                if (entityState.type == EntityType::Portal) {
-                    PortalState portal;
-                    portal.id = id;
-                    portal.cellId = cellId;
-                    portal.isOpen = entityState.isActive;
-                    states.portalEntities[id] = std::move(portal);
-                } else {
+                if (entityState.type != EntityType::Portal) {
                     states.fightEntities[id] = std::move(entityState);
                 }
             } else {
                 if (entityState.type != EntityType::Portal) {
                     states.mapEntities[id] = std::move(entityState);
                 }
+            }
+        }
+
+        auto glyphsMap = lps.glyphs.get();
+        for (const auto& [key, glyph] : glyphsMap.toUnorderedMap()) {
+            if (glyph.glyphTypeId.get() == static_cast<int32_t>(GlyphType::Portal) && glyph.ownerId.get() == states.player.id) {
+                PortalState portal;
+                portal.id = glyph.globalIndex.get();
+                portal.cellId = glyph.cellId.get();
+                portal.isOpen = glyph.active.get();
+                states.portalEntities[portal.id] = std::move(portal);
             }
         }
 
@@ -201,6 +205,12 @@ public:
                       [](const PortalState* a, const PortalState* b) {
                           return a->id < b->id;
                       });
+                      
+            while (sortedPortals.size() > 4) {
+                states.portalEntities.erase(sortedPortals.front()->id);
+                sortedPortals.erase(sortedPortals.begin());
+            }
+
             for (size_t i = 0; i < sortedPortals.size(); ++i) {
                 sortedPortals[i]->index = static_cast<int32_t>(i + 1);
             }

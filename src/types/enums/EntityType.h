@@ -8,6 +8,10 @@ enum class EntityType : int32_t {
     Portal = 0x0004
 };
 
+enum class GlyphType: int32_t {
+    Portal = 0xAD32
+};
+
 inline const char* toString(EntityType t) {
     switch (t) {
         case EntityType::Player:  return "Player";
