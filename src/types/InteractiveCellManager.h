@@ -1,6 +1,8 @@
 #pragma once
 #include "UnityTypes.h"
 #include "MapMetadata.h"
+#include "GridGenerator.h"
+#include "GraphicCell.h"
 
 class InteractiveCellManager : public MonoBehaviour {
 public:
@@ -8,5 +10,7 @@ public:
 
     InteractiveCellManager() : MonoBehaviour("InteractiveCellManager(Clone)", "InteractiveCellManager") {}
 
-    RemotePtr<MapMetadata, 0xE8> mapMetadata{this};
+    Field<MapMetadata, 0xE8> mapMetadata{this};
+    Field<GridGenerator, 0x28> gridGenerator{this};
+    Field<Il2CppList<GraphicCell>, 0x110> graphicCells{this};
 };

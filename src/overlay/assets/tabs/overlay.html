@@ -1,0 +1,36 @@
+<div class="card">
+    <div class="card-title">GRID</div>
+    <div class="stat-row">
+        <span class="stat-label">Grid Overlay</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="color" id="grid-color-picker" class="color-picker" oninput="toggleConfig('gridColor', this.value)">
+            <label class="switch">
+                <input type="checkbox" id="toggle-grid" onchange="toggleConfig('gridOverlay', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label">Grid Mask</span>
+        <div class="segmented-control" id="grid-mask-segment">
+            <div class="segment active" data-type="mode" data-val="rp">RP</div>
+            <div class="segment" data-type="mode" data-val="fight">Fight</div>
+            <div style="width: 1px; background: #4a4d53; margin: 2px 4px;"></div>
+            <div class="segment" data-type="mask" data-val="los">Los</div>
+            <div class="segment" data-type="mask" data-val="move">Move</div>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label">LOS color</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="grid-fill-opacity" min="0" max="100" value="60" oninput="toggleConfig('gridFillOpacity', parseInt(this.value)); document.getElementById('fill-opacity-val').innerText = this.value + '%'" style="width: 80px;">
+            <span id="fill-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">60%</span>
+            <input type="color" id="grid-fill-color" class="color-picker" oninput="toggleConfig('gridFillColor', this.value)">
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label">Dark filter</span>
+        <input type="range" id="bg-overlay" min="0" max="100" value="0" oninput="toggleConfig('backgroundOverlay', parseInt(this.value)); document.getElementById('bg-overlay-val').innerText = this.value + '%'">
+        <span id="bg-overlay-val" style="width: 30px; text-align: right; font-size: 11px;">0%</span>
+    </div>
+</div>

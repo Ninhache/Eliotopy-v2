@@ -6,5 +6,5 @@ class MapMetadata : public ScriptableObject {
 public:
     MapMetadata(uintptr_t addr) : ScriptableObject(addr) {}
 
-    RemotePtr<ClientMapData, 0x18> mapData{this};
+    Field<ClientMapData, 0x18> mapData{this};
 };

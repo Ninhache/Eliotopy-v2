@@ -10,3 +10,18 @@ enum UnityOffsets : size_t {
     listItemsStart = 0x20,
     pointerSize = 0x8
 };
+
+enum ManagedMapOffsets : size_t {
+    dictEntriesArray = 0x18,
+    arrayLength      = 0x18,
+    arrayData        = 0x20,
+    entrySize        = 0x18,
+    entryHashCode    = 0x00,
+    entryKey         = 0x08,
+    entryValue       = 0x10
+};
+
+enum ManagedStringOffsets : size_t {
+    stringLength    = 0x10,
+    firstChar = 0x14
+};

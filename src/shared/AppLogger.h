@@ -23,7 +23,9 @@ private:
     };
 
     static inline ConsoleInitializer initializer;
-    static inline LogLevel minLevel = LogLevel::debug;
+    static inline LogLevel minLevel = LogLevel::info;
+    static inline FILE* consoleFpOut = nullptr;
+    static inline FILE* consoleFpErr = nullptr;
 
     static constexpr std::string_view resetColor = "\033[0m";
     static constexpr std::string_view debugColor = "\033[90m";
@@ -65,6 +67,80 @@ private:
     }
 
 public:
+    static void allocateConsole(HWND parent = nullptr) {
+        HWND hwnd = GetConsoleWindow();
+        if (hwnd != nullptr) {
+            ShowWindow(hwnd, SW_SHOW);
+            if (parent != nullptr) {
+                RECT parentRect, consoleRect;
+                if (GetWindowRect(parent, &parentRect) && GetWindowRect(hwnd, &consoleRect)) {
+                    int w = consoleRect.right - consoleRect.left;
+                    int h = consoleRect.bottom - consoleRect.top;
+                    int x = parentRect.left + (parentRect.right - parentRect.left - w) / 2;
+                    int y = parentRect.top + (parentRect.bottom - parentRect.top - h) / 2;
+                    SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE);
+                }
+            }
+            return;
+        }
+        
+        AllocConsole();
+        freopen_s(&consoleFpOut, "CONOUT$", "w", stdout);
+        freopen_s(&consoleFpErr, "CONOUT$", "w", stderr);
+        
+        HANDLE hOut = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hOut != INVALID_HANDLE_VALUE) {
+            DWORD dwMode = 0;
+            if (GetConsoleMode(hOut, &dwMode)) {
+                dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+                SetConsoleMode(hOut, dwMode);
+            }
+            SetStdHandle(STD_OUTPUT_HANDLE, hOut);
+            SetStdHandle(STD_ERROR_HANDLE, hOut);
+        }
+        
+        std::cout.clear();
+        std::cerr.clear();
+        std::clog.clear();
+
+        hwnd = GetConsoleWindow();
+        if (hwnd) {
+            int x = 0, y = 0;
+            UINT flags = SWP_NOMOVE | SWP_NOSIZE;
+            if (parent != nullptr) {
+                RECT parentRect, consoleRect;
+                if (GetWindowRect(parent, &parentRect) && GetWindowRect(hwnd, &consoleRect)) {
+                    int w = consoleRect.right - consoleRect.left;
+                    int h = consoleRect.bottom - consoleRect.top;
+                    x = parentRect.left + (parentRect.right - parentRect.left - w) / 2;
+                    y = parentRect.top + (parentRect.bottom - parentRect.top - h) / 2;
+                    flags = SWP_NOSIZE;
+                }
+            }
+            SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0, flags);
+
+            HMENU hMenu = GetSystemMenu(hwnd, FALSE);
+            if (hMenu) {
+                EnableMenuItem(hMenu, SC_CLOSE, MF_BYCOMMAND | MF_GRAYED);
+            }
+
+            const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            std::string title;
+            srand((unsigned int)time(NULL));
+            for (int i = 0; i < 16; ++i) {
+                title += charset[rand() % (sizeof(charset) - 1)];
+            }
+            SetConsoleTitleA(title.c_str());
+        }
+    }
+
+    static void freeConsole() {
+        HWND hwnd = GetConsoleWindow();
+        if (hwnd != nullptr) {
+            ShowWindow(hwnd, SW_HIDE);
+        }
+    }
+
     static void setLevel(LogLevel level) { minLevel = level; }
 
     template <typename... Args>

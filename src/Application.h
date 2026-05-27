@@ -1,11 +1,16 @@
 #pragma once
 
 #include <thread>
-#include "ProcessHelper.h"
-#include "AppLogger.h"
+#include <mutex>
+#include <atomic>
+#include "shared/ProcessHelper.h"
+#include "shared/AppLogger.h"
 #include "Resolve6.hpp"
 #include "DataStore.h"
-#include "PeriodicAsyncTimer.h"
+#include "shared/Config.h"
+#include "overlay/Renderer.h"
+#include "overlay/WebViewPanel.h"
+#include "shared/PeriodicAsyncTimer.h"
 #include <timeapi.h>
 
 #pragma comment(lib, "winmm.lib")
@@ -13,8 +18,12 @@
 class Application {
 public:
     DataStore store;
+    Renderer renderer;
+    WebViewPanel panel;
 
     void init() {
+        ConfigManager::get().load();
+
         Logger::info("Searching for Dofus.exe");
         _gamePid = ProcessHelper::getProcessId("Dofus.exe");
         if (_gamePid == 0) {
@@ -34,13 +43,19 @@ public:
         }
 
         Logger::info("Located GameObjectManager successfully");
+        SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+        renderer.init(_gameWindow);
+        panel.init(_gameWindow);
         run();
     }
 
 private:
-    bool _exit = false;
+    std::atomic<bool> _exit = false;
     HWND _gameWindow = nullptr;
     DWORD _gamePid = 0;
+
+    std::mutex _stateMutex;
+    GameState _sharedStates;
 
     bool retrieveObjectManager() const {
         if (!er6::InitSettings(_gamePid, er6::ManagedBackend::Il2Cpp)) {
@@ -50,13 +65,13 @@ private:
 
         er6::WinApiMemoryAccessor mem(er6::g_ctx.process);
         std::uint64_t gomSlotRva = 0;
-        if (!er6::FindGomGlobalSlotRvaByScan(mem, er6::g_ctx.unityPlayer.base, er6::g_ctx.gomOff, gomSlotRva)){
+        if (!er6::FindGomGlobalSlotRvaByScan(mem, er6::g_ctx.unityPlayer.base, er6::g_ctx.gomOff, gomSlotRva)) {
             Logger::error("Failed to resolve Unity GameObjectManager RVA");
             return false;
         }
 
         std::uintptr_t msIdSlotVa = 0;
-        if (!er6::FindMsIdToPointerSlotVaByScan(mem, er6::g_ctx.unityPlayer, er6::g_ctx.off, er6::g_ctx.unityPlayerRange, msIdSlotVa, nullptr)){
+        if (!er6::FindMsIdToPointerSlotVaByScan(mem, er6::g_ctx.unityPlayer, er6::g_ctx.off, er6::g_ctx.unityPlayerRange, msIdSlotVa, nullptr)) {
             Logger::error("Failed to resolve Unity MsIdToPointer table VA");
             return false;
         }
@@ -72,17 +87,56 @@ private:
     void run() {
         timeBeginPeriod(1);
 
-        while (!_exit) {
-            TimeElapsedScopeLogger logger("main loop");
-            if (!IsWindow(_gameWindow))
-                break;
+        std::thread memoryThread([this]() {
+            SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+            while (!_exit) {
+                if (!IsWindow(_gameWindow)) {
+                    _exit = true;
+                    break;
+                }
 
-            PeriodicAsyncTimer::execute(100, [&]() {
                 store.refresh();
-            });
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                {
+                    std::lock_guard<std::mutex> lock(_stateMutex);
+                    _sharedStates = store.states;
+                }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(g_memoryPollRate.load()));
+            }
+        });
+
+        while (!_exit) {
+            if (!IsWindow(_gameWindow)) {
+                _exit = true;
+                break;
+            }
+
+            MSG msg;
+            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+                if (msg.message == WM_QUIT) {
+                    _exit = true;
+                    break;
+                }
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+
+            GameState localStates;
+            {
+                std::lock_guard<std::mutex> lock(_stateMutex);
+                localStates = _sharedStates;
+            }
+
+            renderer.update(localStates);
+            panel.update(localStates);
+
+            MsgWaitForMultipleObjects(0, NULL, FALSE, 16, QS_ALLINPUT);
         }
+
+        if (memoryThread.joinable())
+            memoryThread.join();
+
         Logger::info("Exit Eliotopy");
     }
 };
