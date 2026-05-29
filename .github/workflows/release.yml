@@ -1,0 +1,29 @@
+name: release
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Stage release asset
+        run: Copy-Item build/Release/Eliotopy.exe "Eliotopy-${{ github.ref_name }}.exe"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Eliotopy-${{ github.ref_name }}.exe
+          generate_release_notes: true
