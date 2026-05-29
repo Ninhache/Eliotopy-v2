@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">Memory pulling</span>
+        <span class="stat-label">Memory poll rate</span>
         <div style="display: flex; align-items: center; gap: 8px;">
             <input type="range" id="poll-slider" min="10" max="2000" value="250" oninput="document.getElementById('poll-val').innerText = this.value + 'ms'; setPollRate(this.value)" style="width: 80px; accent-color: #5b21b6; cursor: pointer;">
             <span class="stat-value" id="poll-val" style="width: 45px; text-align: right;">250ms</span>

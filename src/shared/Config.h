@@ -2,27 +2,40 @@
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 #include <string>
 #include <fstream>
+#include <unordered_map>
 #include "json.hpp"
 #include <atomic>
 #include "AppLogger.h"
 
 inline std::atomic<int> g_memoryPollRate{250};
+inline std::atomic<bool> g_losAssistActive{false};
 
 struct ConfigState {
-    bool gridOverlay = true;
+    bool gridOverlay = false;
     std::string gridColor = "#ffffff";
+    int gridOpacity = 100;
     std::string gridMode = "rp";
     bool gridShowLos = true;
     bool gridShowMove = false;
     int gridFillOpacity = 60;
     std::string gridFillColor = "#555555";
     int backgroundOverlay = 0;
+    bool losShowWalls = true;
+    std::string losWallColor = "#1a1a1f";
+    int losWallOpacity = 82;
+    std::string losEvenColor = "#4a4a4f";
+    int losEvenOpacity = 60;
+    std::string losOddColor = "#2e2e33";
+    int losOddOpacity = 68;
     int menuX = -1;
     int menuY = -1;
+    int collapsedX = -1;
+    int collapsedY = -1;
+    std::unordered_map<std::string, std::string> keybinds;
     int64_t trackedEntityId = 0;
 };
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigState, gridOverlay, gridColor, gridMode, gridShowLos, gridShowMove, gridFillOpacity, gridFillColor, backgroundOverlay, menuX, menuY)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigState, gridOverlay, gridColor, gridOpacity, gridMode, gridShowLos, gridShowMove, gridFillOpacity, gridFillColor, backgroundOverlay, losShowWalls, losWallColor, losWallOpacity, losEvenColor, losEvenOpacity, losOddColor, losOddOpacity, menuX, menuY, collapsedX, collapsedY, keybinds)
 
 class ConfigManager {
 private:

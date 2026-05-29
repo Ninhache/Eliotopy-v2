@@ -4,5 +4,5 @@
 #include "ScriptableObject.h"
 #include "MonoBehaviour.h"
 #include "Il2CppList.h"
-#include "ManagedMap.h"
-#include "ManagedString.h"
+#include "Il2CppMap.h"
+#include "Il2CppString.h"

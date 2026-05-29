@@ -7,7 +7,7 @@
 #include "Offsets.h"
 
 template<typename TKey, typename TValue>
-class ManagedMap : public CachedEntity {
+class Il2CppMap : public CachedEntity {
 private:
     static constexpr bool isPrimitive = !std::is_base_of_v<CachedEntity, TValue>;
 
@@ -19,46 +19,46 @@ private:
     std::vector<Entry> _entries;
 
 public:
-    ManagedMap(uintptr_t addr, const std::source_location& loc = std::source_location::current())
+    Il2CppMap(uintptr_t addr, const std::source_location& loc = std::source_location::current())
         : CachedEntity(addr, loc) {
-        this->entityName = "ManagedMap";
+        this->entityName = "Il2CppMap";
     }
 
     bool load(const std::source_location& loc = std::source_location::current()) override {
         _entries.clear();
         if (!isValid()) return false;
 
-        auto entriesOpt = er6::ReadValue<uintptr_t>(address + ManagedMapOffsets::dictEntriesArray);
+        auto entriesOpt = er6::ReadValue<uintptr_t>(address + Il2CppMapOffsets::dictEntriesArray);
         if (!entriesOpt.has_value() || entriesOpt.value() <= 0x100000) return false;
         uintptr_t entAddr = entriesOpt.value();
 
-        auto lengthOpt = er6::ReadValue<int32_t>(entAddr + ManagedMapOffsets::arrayLength);
+        auto lengthOpt = er6::ReadValue<int32_t>(entAddr + Il2CppMapOffsets::arrayLength);
         if (!lengthOpt.has_value() || lengthOpt.value() <= 0 || lengthOpt.value() > 1024) return false;
         int32_t length = lengthOpt.value();
 
         for (int32_t i = 0; i < length; ++i) {
-            uintptr_t base = entAddr + ManagedMapOffsets::arrayData + static_cast<uintptr_t>(i) * ManagedMapOffsets::entrySize;
+            uintptr_t base = entAddr + Il2CppMapOffsets::arrayData + static_cast<uintptr_t>(i) * Il2CppMapOffsets::entrySize;
 
-            auto hashCode = er6::ReadValue<int32_t>(base + ManagedMapOffsets::entryHashCode);
+            auto hashCode = er6::ReadValue<int32_t>(base + Il2CppMapOffsets::entryHashCode);
             if (!hashCode.has_value() || hashCode.value() < 0) continue;
 
-            auto key = er6::ReadValue<TKey>(base + ManagedMapOffsets::entryKey);
+            auto key = er6::ReadValue<TKey>(base + Il2CppMapOffsets::entryKey);
             if (!key.has_value()) continue;
 
             if constexpr (isPrimitive) {
-                auto val = er6::ReadValue<TValue>(base + ManagedMapOffsets::entryValue);
+                auto val = er6::ReadValue<TValue>(base + Il2CppMapOffsets::entryValue);
                 if (val.has_value()) {
                     _entries.push_back({key.value(), val.value()});
                 }
             } else {
-                auto valPtr = er6::ReadValue<uintptr_t>(base + ManagedMapOffsets::entryValue);
+                auto valPtr = er6::ReadValue<uintptr_t>(base + Il2CppMapOffsets::entryValue);
                 if (valPtr.has_value() && valPtr.value() > 0x100000) {
                     _entries.push_back({key.value(), valPtr.value()});
                 }
             }
         }
 
-        Logger::debug(loc, "[ManagedMap] Parsed {} entries from 0x{:X}", _entries.size(), address);
+        Logger::debug(loc, "[Il2CppMap] Parsed {} entries from 0x{:X}", _entries.size(), address);
         return true;
     }
 

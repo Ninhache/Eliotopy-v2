@@ -11,7 +11,7 @@ enum UnityOffsets : size_t {
     pointerSize = 0x8
 };
 
-enum ManagedMapOffsets : size_t {
+enum Il2CppMapOffsets : size_t {
     dictEntriesArray = 0x18,
     arrayLength      = 0x18,
     arrayData        = 0x20,
@@ -21,7 +21,7 @@ enum ManagedMapOffsets : size_t {
     entryValue       = 0x10
 };
 
-enum ManagedStringOffsets : size_t {
+enum Il2CppStringOffsets : size_t {
     stringLength    = 0x10,
     firstChar = 0x14
 };

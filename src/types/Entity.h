@@ -11,5 +11,5 @@ public:
     //note EntityLook 8553 for portals
     Field<EntityType, 0x60> type{this};
     Field<int32_t, 0x50, 0x84> cellId{this};
-    Field<ManagedString, 0x38, 0xD8, 0x20> animationState{this};
+    Field<Il2CppString, 0x38, 0xD8, 0x20> animationState{this};
 };

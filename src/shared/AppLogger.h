@@ -66,11 +66,21 @@ private:
         return (lastSlash != std::string_view::npos) ? std::string(path.substr(lastSlash + 1)) : std::string(path);
     }
 
+private:
+    static void hideFromTaskbar(HWND hwnd) {
+        if (!hwnd) return;
+        LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+        exStyle = (exStyle | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW;
+        ShowWindow(hwnd, SW_HIDE);
+        SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle);
+        ShowWindow(hwnd, SW_SHOW);
+    }
+
 public:
     static void allocateConsole(HWND parent = nullptr) {
         HWND hwnd = GetConsoleWindow();
         if (hwnd != nullptr) {
-            ShowWindow(hwnd, SW_SHOW);
+            hideFromTaskbar(hwnd);
             if (parent != nullptr) {
                 RECT parentRect, consoleRect;
                 if (GetWindowRect(parent, &parentRect) && GetWindowRect(hwnd, &consoleRect)) {
@@ -105,6 +115,7 @@ public:
 
         hwnd = GetConsoleWindow();
         if (hwnd) {
+            hideFromTaskbar(hwnd);
             int x = 0, y = 0;
             UINT flags = SWP_NOMOVE | SWP_NOSIZE;
             if (parent != nullptr) {

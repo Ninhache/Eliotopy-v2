@@ -1,6 +1,3 @@
-const iconMinus = '<path d="M19 13H5v-2h14v2z"/>';
-const iconPlus = '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>';
-
 let currentConfig = { gridOverlay: true };
 let initialized = false;
 
@@ -8,6 +5,45 @@ const el = id => document.getElementById(id);
 const text = (id, val) => { if (el(id)) el(id).innerText = val; };
 const show = (id, visible) => { if (el(id)) el(id).style.display = visible ? 'flex' : 'none'; };
 const showBlock = (id, visible) => { if (el(id)) el(id).style.display = visible ? 'block' : 'none'; };
+
+function applyUi(ui) {
+    document.body.classList.toggle('collapsed', !!ui.collapsed);
+    ['top', 'bottom', 'left', 'right'].forEach(d =>
+        document.body.classList.toggle('dock-' + d, ui.dock === d));
+}
+
+let lastKeybindsSignature = '';
+
+function post(msg) {
+    if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage(msg);
+}
+
+function onKeybindClick(id, capturing) {
+    post(capturing ? 'kbcancel' : 'kbcapture:' + id);
+}
+
+function clearKeybind(id, event) {
+    event.stopPropagation();
+    post('kbclear:' + id);
+}
+
+function renderKeybinds(list, capturingId) {
+    const signature = JSON.stringify(list) + '|' + (capturingId || '');
+    if (signature === lastKeybindsSignature) return;
+    lastKeybindsSignature = signature;
+
+    for (const a of list) {
+        const host = el('kb-ctrl-' + a.id);
+        if (!host) continue;
+        const capturing = a.id === capturingId;
+        const chipText = capturing ? 'Press a key...' : (a.bind || 'Unbound');
+        const cls = 'keybind-chip' + (capturing ? ' capturing' : '') + (!a.bind ? ' unbound' : '');
+        host.innerHTML = `<span class="${cls}" onclick="onKeybindClick('${a.id}', ${capturing})">${chipText}</span>
+            <span class="kb-clear" onclick="clearKeybind('${a.id}', event)" title="Clear">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </span>`;
+    }
+}
 
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -167,6 +203,11 @@ function updateState(data) {
     
     try {
         const payload = JSON.parse(data);
+
+        if (payload.ui) applyUi(payload.ui);
+
+        if (!payload.state) return;
+
         const state = payload.state;
         currentConfig = payload.config;
 
@@ -174,6 +215,10 @@ function updateState(data) {
         
         if (el('toggle-grid')) el('toggle-grid').checked = currentConfig.gridOverlay;
         if (el('grid-color-picker')) el('grid-color-picker').value = currentConfig.gridColor || '#ffffff';
+        if (el('grid-opacity')) {
+            el('grid-opacity').value = currentConfig.gridOpacity ?? 100;
+            el('grid-opacity-val').innerText = el('grid-opacity').value + '%';
+        }
         if (currentConfig.gridMode) {
             document.querySelectorAll('#grid-mask-segment .segment[data-type="mode"]').forEach(s => {
                 if (s.dataset.val === currentConfig.gridMode) s.classList.add('active');
@@ -204,11 +249,29 @@ function updateState(data) {
             el('bg-overlay').value = currentConfig.backgroundOverlay ?? 0;
             el('bg-overlay-val').innerText = el('bg-overlay').value + '%';
         }
+        if (el('toggle-los-walls')) el('toggle-los-walls').checked = currentConfig.losShowWalls ?? true;
+        if (el('los-wall-color')) el('los-wall-color').value = currentConfig.losWallColor || '#1a1a1f';
+        if (el('los-wall-opacity')) {
+            el('los-wall-opacity').value = currentConfig.losWallOpacity ?? 82;
+            el('los-wall-opacity-val').innerText = el('los-wall-opacity').value + '%';
+        }
+        if (el('los-even-color')) el('los-even-color').value = currentConfig.losEvenColor || '#4a4a4f';
+        if (el('los-even-opacity')) {
+            el('los-even-opacity').value = currentConfig.losEvenOpacity ?? 60;
+            el('los-even-opacity-val').innerText = el('los-even-opacity').value + '%';
+        }
+        if (el('los-odd-color')) el('los-odd-color').value = currentConfig.losOddColor || '#2e2e33';
+        if (el('los-odd-opacity')) {
+            el('los-odd-opacity').value = currentConfig.losOddOpacity ?? 68;
+            el('los-odd-opacity-val').innerText = el('los-odd-opacity').value + '%';
+        }
         
         if (el('statusDot')) {
             el('statusDot').style.background = state.isInGame ? '#23a559' : '#ef4444';
             el('statusDot').style.boxShadow = state.isInGame ? '0 0 8px rgba(35,165,89,0.5)' : '0 0 8px rgba(239,68,68,0.5)';
         }
+
+        if (payload.keybinds) renderKeybinds(payload.keybinds, payload.capturingId);
     } catch(e) {
         console.error("Erreur parsing JSON:", e);
     }
@@ -229,12 +292,9 @@ el('header').addEventListener('mousedown', e => {
 
 el('collapseBtn').addEventListener('click', e => {
     e.stopPropagation();
-    document.body.classList.toggle('collapsed');
     if (window.chrome && window.chrome.webview) {
         window.chrome.webview.postMessage('toggle');
     }
-    const icon = el('collapseIcon');
-    icon.innerHTML = document.body.classList.contains('collapsed') ? iconPlus : iconMinus;
 });
 
 const exitBtn = document.getElementById('exit-btn');

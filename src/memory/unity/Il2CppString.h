@@ -5,7 +5,7 @@
 #include "Memory.h"
 #include "Offsets.h"
 
-class ManagedString : public CachedEntity {
+class Il2CppString : public CachedEntity {
 private:
     std::string _decoded;
 
@@ -30,33 +30,33 @@ private:
     }
 
 public:
-    ManagedString(uintptr_t addr, const std::source_location& loc = std::source_location::current())
+    Il2CppString(uintptr_t addr, const std::source_location& loc = std::source_location::current())
         : CachedEntity(addr, loc) {
-        this->entityName = "ManagedString";
+        this->entityName = "Il2CppString";
     }
 
     bool load(const std::source_location& loc = std::source_location::current()) override {
         _decoded.clear();
         if (!isValid()) {
-            Logger::warn(loc, "[ManagedString] Invalid address 0x{:X}", address);
+            Logger::warn(loc, "[Il2CppString] Invalid address 0x{:X}", address);
             return false;
         }
 
-        auto lenOpt = er6::ReadValue<int32_t>(address + ManagedStringOffsets::stringLength);
+        auto lenOpt = er6::ReadValue<int32_t>(address + Il2CppStringOffsets::stringLength);
         if (!lenOpt.has_value() || lenOpt.value() <= 0 || lenOpt.value() > 65535) {
-            Logger::warn(loc, "[ManagedString] Invalid or empty length at 0x{:X}", address + ManagedStringOffsets::stringLength);
+            Logger::warn(loc, "[Il2CppString] Invalid or empty length at 0x{:X}", address + Il2CppStringOffsets::stringLength);
             return false;
         }
         int32_t strLen = lenOpt.value();
 
         std::vector<char16_t> utf16buf(strLen);
-        if (!er6::Mem().Read(address + ManagedStringOffsets::firstChar, utf16buf.data(), static_cast<size_t>(strLen) * sizeof(char16_t))) {
-            Logger::error(loc, "[ManagedString] Failed to read UTF-16 buffer at 0x{:X} ({} chars)", address + ManagedStringOffsets::firstChar, strLen);
+        if (!er6::Mem().Read(address + Il2CppStringOffsets::firstChar, utf16buf.data(), static_cast<size_t>(strLen) * sizeof(char16_t))) {
+            Logger::error(loc, "[Il2CppString] Failed to read UTF-16 buffer at 0x{:X} ({} chars)", address + Il2CppStringOffsets::firstChar, strLen);
             return false;
         }
 
         _decoded = utf16ToUtf8(utf16buf.data(), strLen);
-        Logger::debug(loc, "[ManagedString] Decoded '{}' ({} chars)", _decoded, strLen);
+        Logger::debug(loc, "[Il2CppString] Decoded '{}' ({} chars)", _decoded, strLen);
         return true;
     }
 

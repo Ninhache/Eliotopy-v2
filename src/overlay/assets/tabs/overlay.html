@@ -2,7 +2,9 @@
     <div class="card-title">GRID</div>
     <div class="stat-row">
         <span class="stat-label">Grid Overlay</span>
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="grid-opacity" min="0" max="100" value="100" oninput="toggleConfig('gridOpacity', parseInt(this.value)); document.getElementById('grid-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <span id="grid-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">100%</span>
             <input type="color" id="grid-color-picker" class="color-picker" oninput="toggleConfig('gridColor', this.value)">
             <label class="switch">
                 <input type="checkbox" id="toggle-grid" onchange="toggleConfig('gridOverlay', this.checked)">
@@ -32,5 +34,37 @@
         <span class="stat-label">Dark filter</span>
         <input type="range" id="bg-overlay" min="0" max="100" value="0" oninput="toggleConfig('backgroundOverlay', parseInt(this.value)); document.getElementById('bg-overlay-val').innerText = this.value + '%'">
         <span id="bg-overlay-val" style="width: 30px; text-align: right; font-size: 11px;">0%</span>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">LOS ASSIST</div>
+    <div class="stat-row">
+        <span class="stat-label">Show walls</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="los-wall-opacity" min="0" max="100" value="82" oninput="toggleConfig('losWallOpacity', parseInt(this.value)); document.getElementById('los-wall-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <span id="los-wall-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">82%</span>
+            <input type="color" id="los-wall-color" class="color-picker" oninput="toggleConfig('losWallColor', this.value)">
+            <label class="switch">
+                <input type="checkbox" id="toggle-los-walls" onchange="toggleConfig('losShowWalls', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label">Pair cells</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="los-even-opacity" min="0" max="100" value="60" oninput="toggleConfig('losEvenOpacity', parseInt(this.value)); document.getElementById('los-even-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <span id="los-even-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">60%</span>
+            <input type="color" id="los-even-color" class="color-picker" oninput="toggleConfig('losEvenColor', this.value)">
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label">Impair cells</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="los-odd-opacity" min="0" max="100" value="68" oninput="toggleConfig('losOddOpacity', parseInt(this.value)); document.getElementById('los-odd-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <span id="los-odd-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">68%</span>
+            <input type="color" id="los-odd-color" class="color-picker" oninput="toggleConfig('losOddColor', this.value)">
+        </div>
     </div>
 </div>

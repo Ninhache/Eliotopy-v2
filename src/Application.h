@@ -7,6 +7,7 @@
 #include "shared/AppLogger.h"
 #include "Resolve6.hpp"
 #include "DataStore.h"
+#include "Keybind.h"
 #include "shared/Config.h"
 #include "overlay/Renderer.h"
 #include "overlay/WebViewPanel.h"
@@ -20,6 +21,7 @@ public:
     DataStore store;
     Renderer renderer;
     WebViewPanel panel;
+    KeybindManager keybinds;
 
     void init() {
         ConfigManager::get().load();
@@ -46,6 +48,8 @@ public:
         SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
         renderer.init(_gameWindow);
         panel.init(_gameWindow);
+        keybinds.init(_gameWindow);
+        registerKeybinds();
         run();
     }
 
@@ -82,6 +86,27 @@ private:
         er6::g_ctx.msIdToPointerSlotVa = msIdSlotVa;
         er6::g_ctx.msIdToPointerSlotRva = static_cast<std::uint64_t>(msIdSlotVa - er6::g_ctx.unityPlayer.base);
         return true;
+    }
+
+    void registerKeybinds() {
+        auto& registry = KeybindRegistry::get();
+        registry.attach(&keybinds);
+
+        registry.registerAction("toggle_grid", "Toggle Grid", Keybind{ 'G', false, true, false }, [] {
+            auto& config = ConfigManager::get();
+            config.state.gridOverlay = !config.state.gridOverlay;
+            config.save();
+        });
+
+        registry.registerAction("toggle_menu", "Toggle Menu", Keybind{}, [this] {
+            panel.toggleCollapse();
+        });
+
+        registry.registerHoldAction("los_assist", "LOS Assist", Keybind{},
+            [] { g_losAssistActive = true; },
+            [] { g_losAssistActive = false; });
+
+        registry.loadFromConfig();
     }
 
     void run() {
@@ -133,6 +158,8 @@ private:
 
             MsgWaitForMultipleObjects(0, NULL, FALSE, 16, QS_ALLINPUT);
         }
+
+        keybinds.shutdown();
 
         if (memoryThread.joinable())
             memoryThread.join();
