@@ -10,6 +10,8 @@
 ![status](https://img.shields.io/badge/status-Beta%20%7C%20Active%20Development-orange)
 [![build](https://github.com/Romain-P/Eliotopy-v2/actions/workflows/build.yml/badge.svg)](https://github.com/Romain-P/Eliotopy-v2/actions/workflows/build.yml)
 
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/xYMN5yXNkj)
+
 <img src=".github/assets/preview.gif" width="820" alt="Eliotopy overlay">
 
 </div>
