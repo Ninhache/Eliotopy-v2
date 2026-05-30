@@ -106,6 +106,7 @@ You get a standalone `build/Release/Eliotopy.exe` (static CRT, nothing to instal
 - [ ] Scripts to assist on mechanically hard bosses
 - [ ] Automatic in-app updater
 - [ ] Randomized process name so Eliotopy doesn't stand out in the Windows process list
+- [ ] Smarter portal state: a portal is closed only when no entity stands on it, or when closed manually
 
 ## License
 
