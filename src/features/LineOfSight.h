@@ -9,7 +9,8 @@ class LineOfSight {
 public:
     static constexpr int kMapWidth = 14;
 
-    static std::unordered_set<int> visibleFrom(const std::vector<Cell>& cells, int sourceCellId) {
+    static std::unordered_set<int> visibleFrom(const std::vector<Cell>& cells, int sourceCellId,
+                                               const std::unordered_set<int>& blockers = {}) {
         std::unordered_set<int> visible;
         if (sourceCellId < 0)
             return visible;
@@ -17,7 +18,7 @@ public:
         std::unordered_map<int, bool> blocking;
         blocking.reserve(cells.size() * 2);
         for (const auto& cell : cells)
-            blocking[cell.cellNumber] = !cell.los;
+            blocking[cell.cellNumber] = !cell.los || blockers.count(cell.cellNumber) > 0;
 
         visible.reserve(cells.size());
         for (const auto& cell : cells) {

@@ -21,14 +21,22 @@ public:
             }
         }
 
-        bool dirty = (active != _active) || (active && hovered != _hovered);
+        std::unordered_set<int> blockers;
+        if (state.isInFight)
+            for (const auto& [id, entity] : state.fightEntities)
+                if (entity.cellId >= 0)
+                    blockers.insert(entity.cellId);
 
-        if (active && (hovered != _hovered || state.cells.size() != _lastCellCount))
-            _visible = LineOfSight::visibleFrom(state.cells, hovered);
+        bool blockersChanged = (blockers != _blockers);
+        bool dirty = (active != _active) || (active && (hovered != _hovered || blockersChanged));
+
+        if (active && (hovered != _hovered || state.cells.size() != _lastCellCount || blockersChanged))
+            _visible = LineOfSight::visibleFrom(state.cells, hovered, blockers);
 
         _hovered = hovered;
         _active = active;
         _lastCellCount = state.cells.size();
+        _blockers = std::move(blockers);
         return dirty;
     }
 
@@ -66,6 +74,7 @@ public:
 
 private:
     std::unordered_set<int> _visible;
+    std::unordered_set<int> _blockers;
     int _hovered = -1;
     bool _active = false;
     size_t _lastCellCount = 0;
