@@ -35,6 +35,7 @@ private:
     ComPtr<ID2D1DCRenderTarget> _renderTarget;
     ComPtr<ID2D1SolidColorBrush> _brush;
     ComPtr<ID2D1PathGeometry> _unitDiamond;
+    ComPtr<ID2D1StrokeStyle> _miterStroke;
     ComPtr<IDWriteFactory> _dwriteFactory;
     ComPtr<IDWriteTextFormat> _textFormat;
 
@@ -122,6 +123,9 @@ private:
         if (!createUnitDiamond())
             return false;
 
+        if (!createStrokeStyles())
+            return false;
+
         return createTextFormat();
     }
 
@@ -165,6 +169,13 @@ private:
         sink->AddLines(edges, ARRAYSIZE(edges));
         sink->EndFigure(D2D1_FIGURE_END_CLOSED);
         return SUCCEEDED(sink->Close());
+    }
+
+    bool createStrokeStyles() {
+        D2D1_STROKE_STYLE_PROPERTIES props = D2D1::StrokeStyleProperties(
+            D2D1_CAP_STYLE_FLAT, D2D1_CAP_STYLE_FLAT, D2D1_CAP_STYLE_FLAT,
+            D2D1_LINE_JOIN_MITER, 10.0f, D2D1_DASH_STYLE_SOLID, 0.0f);
+        return SUCCEEDED(_d2dFactory->CreateStrokeStyle(props, nullptr, 0, _miterStroke.ReleaseAndGetAddressOf()));
     }
 
     bool ensureSurface(int width, int height) {
@@ -320,6 +331,7 @@ public:
         ctx.target = _renderTarget.Get();
         ctx.brush = _brush.Get();
         ctx.unitDiamond = _unitDiamond.Get();
+        ctx.miterStroke = _miterStroke.Get();
         ctx.width = winWidth;
         ctx.height = winHeight;
         ctx.valid = computeBasis(state.viewProjMatrix, winWidth, winHeight, ctx.origin, ctx.scaleX, ctx.scaleY);

@@ -12,6 +12,7 @@ struct RenderContext {
     ID2D1RenderTarget* target = nullptr;
     ID2D1SolidColorBrush* brush = nullptr;
     ID2D1PathGeometry* unitDiamond = nullptr;
+    ID2D1StrokeStyle* miterStroke = nullptr;
     ID2D1Factory* factory = nullptr;
     IDWriteFactory* dwrite = nullptr;
     IDWriteTextFormat* textFormat = nullptr;
@@ -49,15 +50,22 @@ struct RenderContext {
     }
 
     void drawDiamondOutline(float cx, float cy, float hw, float hh, const D2D1_COLOR_F& color, float stroke) const {
+        if (!factory)
+            return;
+        Microsoft::WRL::ComPtr<ID2D1PathGeometry> geometry;
+        if (FAILED(factory->CreatePathGeometry(geometry.GetAddressOf())))
+            return;
+        Microsoft::WRL::ComPtr<ID2D1GeometrySink> sink;
+        if (FAILED(geometry->Open(sink.GetAddressOf())))
+            return;
+        const D2D1_POINT_2F edges[] = { { cx, cy - hh }, { cx + hw, cy }, { cx, cy + hh } };
+        sink->BeginFigure(D2D1::Point2F(cx - hw, cy), D2D1_FIGURE_BEGIN_HOLLOW);
+        sink->AddLines(edges, ARRAYSIZE(edges));
+        sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+        if (FAILED(sink->Close()))
+            return;
         brush->SetColor(color);
-        D2D1_POINT_2F left = { cx - hw, cy };
-        D2D1_POINT_2F top = { cx, cy - hh };
-        D2D1_POINT_2F right = { cx + hw, cy };
-        D2D1_POINT_2F bottom = { cx, cy + hh };
-        target->DrawLine(left, top, brush, stroke);
-        target->DrawLine(top, right, brush, stroke);
-        target->DrawLine(right, bottom, brush, stroke);
-        target->DrawLine(bottom, left, brush, stroke);
+        target->DrawGeometry(geometry.Get(), brush, stroke, miterStroke);
     }
 
     void fillRect(float left, float top, float right, float bottom, const D2D1_COLOR_F& color) const {
