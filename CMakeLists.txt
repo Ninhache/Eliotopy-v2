@@ -11,9 +11,10 @@ set(WEBVIEW2_DIR ${CMAKE_SOURCE_DIR}/libs/webview2/Microsoft.Web.WebView2.1.0.32
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/WebAssets.h
     COMMAND ${CMAKE_COMMAND} -D SRC_DIR=${CMAKE_SOURCE_DIR} -D BIN_DIR=${CMAKE_CURRENT_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/scripts/pack_web_assets.cmake
-    DEPENDS 
+    DEPENDS
         ${CMAKE_SOURCE_DIR}/src/overlay/assets/index.html
         ${CMAKE_SOURCE_DIR}/src/overlay/assets/style.css
+        ${CMAKE_SOURCE_DIR}/src/overlay/assets/i18n.js
         ${CMAKE_SOURCE_DIR}/src/overlay/assets/app.js
         ${CMAKE_SOURCE_DIR}/src/overlay/assets/tabs/settings.html
         ${CMAKE_SOURCE_DIR}/src/overlay/assets/tabs/overlay.html

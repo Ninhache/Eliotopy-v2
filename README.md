@@ -29,6 +29,8 @@ It's a full rewrite of the original [Eliotopy](https://github.com/Romain-P/Eliot
 
 Nightly builds run on every push to `master`. They're not releases: they follow the current work in progress, so expect them to be unstable or sometimes broken. If you want something solid, take a release.
 
+> **⚠️ Important: antivirus false positive.** Your antivirus may flag Eliotopy v2 as a virus. It reads the game's memory and intercepts keyboard keys, which heuristics often mistake for a potential keylogger. This is a false positive: Eliotopy is open-source and you can easily check for malicious behaviors. If you want to use it, **whitelist the process in your antivirus**, or **temporarily disable your antivirus**. Builds are compiled automatically by the CI, but if you have any doubt, the full source code is accessible, so you can also build it yourself instead of trusting the prebuilt binary
+
 ## Features
 
 - **Fully external.** No DLL injection, no hooks inside the game, nothing written to its process. Eliotopy only reads memory and never sends any input.
