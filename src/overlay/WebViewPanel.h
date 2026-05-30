@@ -9,6 +9,7 @@
 #include "Config.h"
 #include "Utils.h"
 #include "Keybind.h"
+#include "Version.h"
 
 using namespace Microsoft::WRL;
 
@@ -235,7 +236,12 @@ private:
     }
 
     std::wstring buildHtml() {
-        return Utils::toWide(std::string(reinterpret_cast<const char*>(webview::web_html_data)));
+        std::string html(reinterpret_cast<const char*>(webview::web_html_data));
+        const std::string token = "{{VERSION}}";
+        size_t pos = html.find(token);
+        if (pos != std::string::npos)
+            html.replace(pos, token.size(), std::string("v") + ELIOTOPY_VERSION);
+        return Utils::toWide(html);
     }
 
     void createHostWindow(HWND gameWindow) {
@@ -540,13 +546,29 @@ private:
         return S_OK;
     }
 
+    std::wstring cacheFolderName() {
+        wchar_t path[MAX_PATH] = {};
+        GetModuleFileNameW(nullptr, path, MAX_PATH);
+        std::wstring name = path;
+        size_t slash = name.find_last_of(L"\\/");
+        if (slash != std::wstring::npos)
+            name = name.substr(slash + 1);
+
+        unsigned long long hash = 1469598103934665603ull;
+        for (wchar_t c : name) {
+            hash ^= static_cast<unsigned short>(c);
+            hash *= 1099511628211ull;
+        }
+        return std::to_wstring(hash);
+    }
+
 public:
     void init(HWND gameWindow) {
         createHostWindow(gameWindow);
 
         wchar_t tempPath[MAX_PATH];
         GetTempPathW(MAX_PATH, tempPath);
-        std::wstring userDataFolder = std::wstring(tempPath) + L"EliotopyWebViewCache";
+        std::wstring userDataFolder = std::wstring(tempPath) + cacheFolderName();
 
         CreateCoreWebView2EnvironmentWithOptions(nullptr, userDataFolder.c_str(), nullptr,
             Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(

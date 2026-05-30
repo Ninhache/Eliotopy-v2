@@ -1,0 +1,3 @@
+#pragma once
+
+#define ELIOTOPY_VERSION "@ELIOTOPY_VERSION@"
