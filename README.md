@@ -33,10 +33,14 @@ Nightly builds run on every push to `master`. They're not releases: they follow 
 
 - **Fully external.** No DLL injection, no hooks inside the game, nothing written to its process. Eliotopy only reads memory and never sends any input.
 - **Live game state.** Map grid, movement and line-of-sight flags, entities, portals and player stats, straight from the Unity / IL2CPP runtime.
-- **Direct2D overlay.** Drawn on top of the game and split into small components (grid, dark filter, entity tracking).
+- **Portal network and redirection.** Follows your real Eliotrope portals from memory, or plan your own by hand with binds using the in-game logic (four max, the oldest drops when you place a fifth). *Preview Exit* (hold) simulates dropping a portal on the cell under your cursor and draws where the redirection comes out, with the damage bonus in percent. *Preview Entrance* (toggle) does the opposite: pick an exit portal and every cell you could enter from to come out there lights up.
+- **Portal numbers.** Drawn over the game's own number so you can actually read them, with a configurable shape (round, square, diamond), color, size and offset.
 - **LOS assist.** Hold a key and it shows the line of sight from the cell under your cursor, using the same algorithm as the game. Obstacles and cells you can't see get a grey checkerboard.
-- **Control panel.** A draggable panel that snaps to the screen edges. It shows live state, lets you customize the overlay (colors, opacity, filters) and rebind every action.
-- **Keybinds.** Bind any combo of modifiers plus a key, a mouse button or the wheel, including hold actions. Bound inputs are caught and never reach the game.
+- **Distance measure.** Hold a key to pin the cell under your cursor, then read the distance to wherever you hover.
+- **Direct2D overlay.** Drawn on top of the game and split into small components (grid, dark filter, portals, LOS).
+- **Control panel.** A draggable panel that snaps to the screen edges. It shows live state and lets you style every feature (colors, opacity, fill, thickness, ...) and rebind every action, each control with its own tooltip.
+- **Multi-language.** English, French, Spanish, German and Portuguese, switchable on the fly.
+- **Keybinds.** Bind any combo of modifiers plus a key, a mouse button or the wheel, including hold and toggle actions. Bound inputs are caught and never reach the game.
 
 ## Approach: MITM vs memory reading
 
@@ -54,11 +58,12 @@ src/
 ├─ memory/               typed external-memory model (CachedEntity, Field, Il2Cpp*)
 ├─ types/                Dofus structures (cells, entities, services, ...)
 ├─ datastore/            plain state structs (GameState, MapState, ...)
-├─ features/             feature logic (LineOfSight)
+├─ features/             feature logic (LineOfSight, RedirectionHelper, PortalPlanner)
 └─ overlay/
    ├─ Renderer.h         Direct2D device + window orchestrator
    ├─ WebViewPanel.h     control panel
-   └─ components/        RenderContext + GridRenderer / LosRenderer / ...
+   ├─ assets/            HTML/CSS/JS panel + i18n, packed into the binary
+   └─ components/        RenderContext + GridRenderer / LosRenderer / PortalRenderer / ...
 ```
 
 - Memory access goes through `er6`, an external IL2CPP resolver. It finds `UnityPlayer.dll`, the `GameObjectManager` slot and the MSID pointer table by scanning signatures.
@@ -90,10 +95,17 @@ You get a standalone `build/Release/Eliotopy.exe` (static CRT, nothing to instal
 - [x] Direct2D overlay (grid, dark filter, entity tracking)
 - [x] LOS assist (hold), using the real Dofus algorithm
 - [x] Control panel (live state, overlay customization, keybind editor)
-- [x] Keybind system (keyboard / mouse / wheel, hold)
+- [x] Keybind system (keyboard / mouse / wheel, hold and toggle)
 - [x] CI builds and automated releases
-- [ ] Portal network detection and redirection planning
-- [ ] Distance overlay
+- [x] Portal network and redirection (preview exit / entrance, manual placement, damage bonus)
+- [x] Distance measure
+- [x] Multi-language UI (EN / FR / ES / DE / PT)
+- [ ] Factor entities into line-of-sight calculations
+- [ ] AI turn assist to land a hit on a target through portals
+- [ ] Lua engine with a rich API to write scripts and build AIs
+- [ ] Scripts to assist on mechanically hard bosses
+- [ ] Automatic in-app updater
+- [ ] Randomized process name so Eliotopy doesn't stand out in the Windows process list
 
 ## License
 

@@ -116,7 +116,11 @@ private:
 
         _messageHandlers[L"poll"] = [](const std::wstring& payload) {
             try {
-                g_memoryPollRate = std::stoi(payload);
+                int rate = std::stoi(payload);
+                g_memoryPollRate = rate;
+                auto& config = ConfigManager::get();
+                config.state.memoryPollRate = rate;
+                config.save();
             } catch (...) {}
         };
 

@@ -32,6 +32,12 @@ public:
         return (c.x + c.y) & 1;
     }
 
+    static void cellGridCoord(int cellId, int& x, int& y) {
+        Coord c = toCoord(cellId);
+        x = c.x;
+        y = c.y;
+    }
+
 private:
     struct Coord {
         int x;

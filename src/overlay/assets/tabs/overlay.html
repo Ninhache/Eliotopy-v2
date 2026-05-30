@@ -1,70 +1,202 @@
 <div class="card">
-    <div class="card-title">GRID</div>
+    <div class="card-title" data-i18n="card.portals">PORTALS</div>
     <div class="stat-row">
-        <span class="stat-label">Grid Overlay</span>
+        <span class="stat-label" data-i18n="portals.portals" data-i18n-tip="portals.portals.tip">Portals</span>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <input type="color" id="portal-color-1" data-i18n-tip="portals.color1.tip" class="color-picker" oninput="toggleConfig('portalColor1', this.value)">
+            <input type="color" id="portal-color-2" data-i18n-tip="portals.color2.tip" class="color-picker" oninput="toggleConfig('portalColor2', this.value)">
+            <input type="color" id="portal-color-3" data-i18n-tip="portals.color3.tip" class="color-picker" oninput="toggleConfig('portalColor3', this.value)">
+            <input type="color" id="portal-color-4" data-i18n-tip="portals.color4.tip" class="color-picker" oninput="toggleConfig('portalColor4', this.value)">
+            <input type="range" id="portal-opacity" data-i18n-tip="portals.opacity.tip" min="0" max="100" value="100" oninput="toggleConfig('portalOpacity', parseInt(this.value)); document.getElementById('portal-opacity-val').innerText = this.value + '%'" style="width: 50px;">
+            <span id="portal-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">100%</span>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.cells" data-i18n-tip="portals.cells.tip">Cells</span>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="range" id="grid-opacity" min="0" max="100" value="100" oninput="toggleConfig('gridOpacity', parseInt(this.value)); document.getElementById('grid-opacity-val').innerText = this.value + '%'" style="width: 60px;">
-            <span id="grid-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">100%</span>
-            <input type="color" id="grid-color-picker" class="color-picker" oninput="toggleConfig('gridColor', this.value)">
-            <label class="switch">
-                <input type="checkbox" id="toggle-grid" onchange="toggleConfig('gridOverlay', this.checked)">
+            <input type="range" id="portal-thickness" data-i18n-tip="portals.thickness.tip" min="1" max="6" value="2" oninput="toggleConfig('portalThickness', parseInt(this.value)); document.getElementById('portal-thickness-val').innerText = this.value + 'px'" style="width: 70px;">
+            <span id="portal-thickness-val" style="width: 28px; text-align: right; font-size: 11px;">2px</span>
+            <label class="switch" data-i18n-tip="portals.fill.tip">
+                <input type="checkbox" id="portal-filled" onchange="toggleConfig('portalFilled', this.checked)">
                 <span class="slider"></span>
             </label>
         </div>
     </div>
     <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">Grid Mask</span>
-        <div class="segmented-control" id="grid-mask-segment">
-            <div class="segment active" data-type="mode" data-val="rp">RP</div>
-            <div class="segment" data-type="mode" data-val="fight">Fight</div>
-            <div style="width: 1px; background: #4a4d53; margin: 2px 4px;"></div>
-            <div class="segment" data-type="mask" data-val="los">Los</div>
-            <div class="segment" data-type="mask" data-val="move">Move</div>
-        </div>
-    </div>
-    <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">LOS color</span>
+        <span class="stat-label" data-i18n="portals.closed" data-i18n-tip="portals.closed.tip">Closed portals</span>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="range" id="grid-fill-opacity" min="0" max="100" value="60" oninput="toggleConfig('gridFillOpacity', parseInt(this.value)); document.getElementById('fill-opacity-val').innerText = this.value + '%'" style="width: 80px;">
-            <span id="fill-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">60%</span>
-            <input type="color" id="grid-fill-color" class="color-picker" oninput="toggleConfig('gridFillColor', this.value)">
+            <input type="color" id="closed-color" data-i18n-tip="portals.closedcolor.tip" class="color-picker" oninput="toggleConfig('closedPortalColor', this.value)">
+            <label class="switch" data-i18n-tip="portals.closedfill.tip">
+                <input type="checkbox" id="closed-filled" onchange="toggleConfig('closedPortalFilled', this.checked)">
+                <span class="slider"></span>
+            </label>
         </div>
     </div>
     <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">Dark filter</span>
-        <input type="range" id="bg-overlay" min="0" max="100" value="0" oninput="toggleConfig('backgroundOverlay', parseInt(this.value)); document.getElementById('bg-overlay-val').innerText = this.value + '%'">
-        <span id="bg-overlay-val" style="width: 30px; text-align: right; font-size: 11px;">0%</span>
+        <span class="stat-label" data-i18n="portals.redirection" data-i18n-tip="portals.redirection.tip">Redirection</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="range" id="connector-thickness" data-i18n-tip="portals.redir.thickness.tip" min="1" max="6" value="3" oninput="toggleConfig('connectorThickness', parseInt(this.value))" style="width: 48px;">
+            <input type="range" id="connector-opacity" data-i18n-tip="portals.redir.opacity.tip" min="0" max="100" value="100" oninput="toggleConfig('connectorOpacity', parseInt(this.value))" style="width: 48px;">
+            <input type="color" id="connector-color" data-i18n-tip="portals.redir.color.tip" class="color-picker" oninput="toggleConfig('connectorColor', this.value)">
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.shownumber" data-i18n-tip="portals.shownumber.tip">Show number</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="color" id="portal-number-color" data-i18n-tip="portals.numbercolor.tip" class="color-picker" oninput="toggleConfig('portalNumberColor', this.value)">
+            <label class="switch" data-i18n-tip="portals.shownumber.tip">
+                <input type="checkbox" id="portal-show-number" onchange="toggleConfig('portalShowNumber', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.numbershape" data-i18n-tip="portals.numbershape.tip">Number shape</span>
+        <div class="segmented-control" id="portal-shape-segment">
+            <div class="segment active" data-val="round" data-i18n="portals.seg.round">Round</div>
+            <div class="segment" data-val="rect" data-i18n="portals.seg.rect">Rect</div>
+            <div class="segment" data-val="diamond" data-i18n="portals.seg.diamond">Diamond</div>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.numoffset" data-i18n-tip="portals.numoffset.tip">Number offset</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="range" id="portal-number-ox" data-i18n-tip="portals.numoffset.x.tip" min="-40" max="40" value="0" oninput="toggleConfig('portalNumberOffsetX', parseInt(this.value))" style="width: 64px;">
+            <input type="range" id="portal-number-oy" data-i18n-tip="portals.numoffset.y.tip" min="-40" max="40" value="0" oninput="toggleConfig('portalNumberOffsetY', parseInt(this.value))" style="width: 64px;">
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.numscale" data-i18n-tip="portals.numscale.tip">Number scale</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="portal-number-scale" data-i18n-tip="portals.numscale.tip" min="50" max="200" value="100" oninput="toggleConfig('portalNumberScale', parseInt(this.value)); document.getElementById('portal-number-scale-val').innerText = this.value + '%'" style="width: 80px;">
+            <span id="portal-number-scale-val" style="width: 32px; text-align: right; font-size: 11px;">100%</span>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.greydeleted" data-i18n-tip="portals.greydeleted.tip">Ghost removed</span>
+        <label class="switch" data-i18n-tip="portals.greydeleted.tip">
+            <input type="checkbox" id="portal-grey-deleted" onchange="toggleConfig('portalGreyDeleted', this.checked)">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.showdistance" data-i18n-tip="portals.showdistance.tip">Show distance</span>
+        <label class="switch" data-i18n-tip="portals.showdistance.tip">
+            <input type="checkbox" id="portal-show-distance" onchange="toggleConfig('portalShowDistance', this.checked)">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.damage" data-i18n-tip="portals.damage.tip">Damage</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="color" id="damage-color" data-i18n-tip="portals.damagecolor.tip" class="color-picker" oninput="toggleConfig('damageColor', this.value)">
+            <label class="switch" data-i18n-tip="portals.damageshow.tip">
+                <input type="checkbox" id="damage-show" onchange="toggleConfig('damageShow', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.damagesize" data-i18n-tip="portals.damagesize.tip">Damage text</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="damage-thickness" data-i18n-tip="portals.damagethickness.tip" min="1" max="9" value="6" oninput="toggleConfig('damageThickness', parseInt(this.value))" style="width: 60px;">
+            <input type="range" id="damage-scale" data-i18n-tip="portals.damagescale.tip" min="50" max="200" value="100" oninput="toggleConfig('damageScale', parseInt(this.value)); document.getElementById('damage-scale-val').innerText = this.value + '%'" style="width: 70px;">
+            <span id="damage-scale-val" style="width: 32px; text-align: right; font-size: 11px;">100%</span>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="portals.damageoutline" data-i18n-tip="portals.damageoutline.tip">Outline</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="damage-outline-thickness" data-i18n-tip="portals.damageoutlinethickness.tip" min="1" max="4" value="2" oninput="toggleConfig('damageOutlineThickness', parseInt(this.value))" style="width: 60px;">
+            <input type="color" id="damage-outline-color" data-i18n-tip="portals.damageoutlinecolor.tip" class="color-picker" oninput="toggleConfig('damageOutlineColor', this.value)">
+            <label class="switch" data-i18n-tip="portals.damageoutline.tip">
+                <input type="checkbox" id="damage-outline" onchange="toggleConfig('damageOutline', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="card-separator" data-i18n="card.preventrance">PREVIEW ENTRANCE</div>
+    <div class="stat-row">
+        <span class="stat-label" data-i18n="preventrance.cells" data-i18n-tip="preventrance.cells.tip">Cells</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="range" id="entrance-thickness" data-i18n-tip="preventrance.thickness.tip" min="1" max="6" value="2" oninput="toggleConfig('entranceThickness', parseInt(this.value))" style="width: 48px;">
+            <input type="range" id="entrance-opacity" data-i18n-tip="preventrance.opacity.tip" min="0" max="100" value="50" oninput="toggleConfig('entranceOpacity', parseInt(this.value))" style="width: 48px;">
+            <input type="color" id="entrance-color" data-i18n-tip="preventrance.color.tip" class="color-picker" oninput="toggleConfig('entranceColor', this.value)">
+            <label class="switch" data-i18n-tip="preventrance.fill.tip">
+                <input type="checkbox" id="entrance-filled" onchange="toggleConfig('entranceFilled', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-title">LOS ASSIST</div>
+    <div class="card-title" data-i18n="card.losassist">LOS ASSIST</div>
     <div class="stat-row">
-        <span class="stat-label">Show walls</span>
+        <span class="stat-label" data-i18n="los.walls" data-i18n-tip="los.walls.tip">Show walls</span>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="range" id="los-wall-opacity" min="0" max="100" value="82" oninput="toggleConfig('losWallOpacity', parseInt(this.value)); document.getElementById('los-wall-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <input type="range" id="los-wall-opacity" data-i18n-tip="los.walls.opacity.tip" min="0" max="100" value="82" oninput="toggleConfig('losWallOpacity', parseInt(this.value)); document.getElementById('los-wall-opacity-val').innerText = this.value + '%'" style="width: 60px;">
             <span id="los-wall-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">82%</span>
-            <input type="color" id="los-wall-color" class="color-picker" oninput="toggleConfig('losWallColor', this.value)">
-            <label class="switch">
+            <input type="color" id="los-wall-color" data-i18n-tip="los.walls.color.tip" class="color-picker" oninput="toggleConfig('losWallColor', this.value)">
+            <label class="switch" data-i18n-tip="los.walls.toggle.tip">
                 <input type="checkbox" id="toggle-los-walls" onchange="toggleConfig('losShowWalls', this.checked)">
                 <span class="slider"></span>
             </label>
         </div>
     </div>
     <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">Pair cells</span>
+        <span class="stat-label" data-i18n="los.even" data-i18n-tip="los.even.tip">Even cells</span>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="range" id="los-even-opacity" min="0" max="100" value="60" oninput="toggleConfig('losEvenOpacity', parseInt(this.value)); document.getElementById('los-even-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <input type="range" id="los-even-opacity" data-i18n-tip="los.even.opacity.tip" min="0" max="100" value="60" oninput="toggleConfig('losEvenOpacity', parseInt(this.value)); document.getElementById('los-even-opacity-val').innerText = this.value + '%'" style="width: 60px;">
             <span id="los-even-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">60%</span>
-            <input type="color" id="los-even-color" class="color-picker" oninput="toggleConfig('losEvenColor', this.value)">
+            <input type="color" id="los-even-color" data-i18n-tip="los.even.color.tip" class="color-picker" oninput="toggleConfig('losEvenColor', this.value)">
         </div>
     </div>
     <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">Impair cells</span>
+        <span class="stat-label" data-i18n="los.odd" data-i18n-tip="los.odd.tip">Odd cells</span>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="range" id="los-odd-opacity" min="0" max="100" value="68" oninput="toggleConfig('losOddOpacity', parseInt(this.value)); document.getElementById('los-odd-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <input type="range" id="los-odd-opacity" data-i18n-tip="los.odd.opacity.tip" min="0" max="100" value="68" oninput="toggleConfig('losOddOpacity', parseInt(this.value)); document.getElementById('los-odd-opacity-val').innerText = this.value + '%'" style="width: 60px;">
             <span id="los-odd-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">68%</span>
-            <input type="color" id="los-odd-color" class="color-picker" oninput="toggleConfig('losOddColor', this.value)">
+            <input type="color" id="los-odd-color" data-i18n-tip="los.odd.color.tip" class="color-picker" oninput="toggleConfig('losOddColor', this.value)">
         </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title" data-i18n="card.grid">GRID</div>
+    <div class="stat-row">
+        <span class="stat-label" data-i18n="grid.overlay" data-i18n-tip="grid.overlay.tip">Grid Overlay</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="grid-opacity" data-i18n-tip="grid.opacity.tip" min="0" max="100" value="100" oninput="toggleConfig('gridOpacity', parseInt(this.value)); document.getElementById('grid-opacity-val').innerText = this.value + '%'" style="width: 60px;">
+            <span id="grid-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">100%</span>
+            <input type="color" id="grid-color-picker" data-i18n-tip="grid.color.tip" class="color-picker" oninput="toggleConfig('gridColor', this.value)">
+            <label class="switch" data-i18n-tip="grid.overlay.tip">
+                <input type="checkbox" id="toggle-grid" onchange="toggleConfig('gridOverlay', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="grid.mask" data-i18n-tip="grid.mask.tip">Grid Mask</span>
+        <div class="segmented-control" id="grid-mask-segment">
+            <div class="segment active" data-type="mode" data-val="rp" data-i18n="grid.seg.rp">RP</div>
+            <div class="segment" data-type="mode" data-val="fight" data-i18n="grid.seg.fight">Fight</div>
+            <div style="width: 1px; background: #4a4d53; margin: 2px 4px;"></div>
+            <div class="segment" data-type="mask" data-val="los" data-i18n="grid.seg.los">Los</div>
+            <div class="segment" data-type="mask" data-val="move" data-i18n="grid.seg.move">Move</div>
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="grid.loscolor" data-i18n-tip="grid.loscolor.tip">LOS color</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="range" id="grid-fill-opacity" data-i18n-tip="grid.losopacity.tip" min="0" max="100" value="60" oninput="toggleConfig('gridFillOpacity', parseInt(this.value)); document.getElementById('fill-opacity-val').innerText = this.value + '%'" style="width: 80px;">
+            <span id="fill-opacity-val" style="width: 28px; text-align: right; font-size: 11px;">60%</span>
+            <input type="color" id="grid-fill-color" data-i18n-tip="grid.loscolor.tip" class="color-picker" oninput="toggleConfig('gridFillColor', this.value)">
+        </div>
+    </div>
+    <div class="stat-row" style="margin-top: 5px;">
+        <span class="stat-label" data-i18n="grid.darkfilter" data-i18n-tip="grid.darkfilter.tip">Dark filter</span>
+        <input type="range" id="bg-overlay" data-i18n-tip="grid.darkfilter.tip" min="0" max="100" value="0" oninput="toggleConfig('backgroundOverlay', parseInt(this.value)); document.getElementById('bg-overlay-val').innerText = this.value + '%'">
+        <span id="bg-overlay-val" style="width: 30px; text-align: right; font-size: 11px;">0%</span>
     </div>
 </div>

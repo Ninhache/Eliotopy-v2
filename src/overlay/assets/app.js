@@ -36,10 +36,10 @@ function renderKeybinds(list, capturingId) {
         const host = el('kb-ctrl-' + a.id);
         if (!host) continue;
         const capturing = a.id === capturingId;
-        const chipText = capturing ? 'Press a key...' : (a.bind || 'Unbound');
+        const chipText = capturing ? t('kb.press') : (a.bind || t('kb.unbound'));
         const cls = 'keybind-chip' + (capturing ? ' capturing' : '') + (!a.bind ? ' unbound' : '');
         host.innerHTML = `<span class="${cls}" onclick="onKeybindClick('${a.id}', ${capturing})">${chipText}</span>
-            <span class="kb-clear" onclick="clearKeybind('${a.id}', event)" title="Clear">
+            <span class="kb-clear" onclick="clearKeybind('${a.id}', event)" title="${t('kb.clear')}">
                 <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
             </span>`;
     }
@@ -73,6 +73,27 @@ document.querySelectorAll('#grid-mask-segment .segment').forEach(seg => {
             if (seg.dataset.val === 'los') toggleConfig('gridShowLos', seg.classList.contains('active'));
             if (seg.dataset.val === 'move') toggleConfig('gridShowMove', seg.classList.contains('active'));
         }
+    });
+});
+
+document.querySelectorAll('#portal-shape-segment .segment').forEach(seg => {
+    seg.addEventListener('click', () => {
+        document.querySelectorAll('#portal-shape-segment .segment').forEach(s => s.classList.remove('active'));
+        seg.classList.add('active');
+        toggleConfig('portalNumberShape', seg.dataset.val);
+    });
+});
+
+let appliedLang = null;
+
+document.querySelectorAll('#lang-segment .segment').forEach(seg => {
+    seg.addEventListener('click', () => {
+        document.querySelectorAll('#lang-segment .segment').forEach(s => s.classList.remove('active'));
+        seg.classList.add('active');
+        appliedLang = seg.dataset.val;
+        toggleConfig('language', seg.dataset.val);
+        applyI18n(seg.dataset.val);
+        lastKeybindsSignature = '';
     });
 });
 
@@ -211,6 +232,15 @@ function updateState(data) {
         const state = payload.state;
         currentConfig = payload.config;
 
+        const lang = currentConfig.language || 'en';
+        if (lang !== appliedLang) {
+            appliedLang = lang;
+            applyI18n(lang);
+            lastKeybindsSignature = '';
+            document.querySelectorAll('#lang-segment .segment').forEach(s =>
+                s.classList.toggle('active', s.dataset.val === lang));
+        }
+
         updateDebugView(state);
         
         if (el('toggle-grid')) el('toggle-grid').checked = currentConfig.gridOverlay;
@@ -265,6 +295,56 @@ function updateState(data) {
             el('los-odd-opacity').value = currentConfig.losOddOpacity ?? 68;
             el('los-odd-opacity-val').innerText = el('los-odd-opacity').value + '%';
         }
+        if (el('portal-color-1')) el('portal-color-1').value = currentConfig.portalColor1 || '#5b21b6';
+        if (el('portal-color-2')) el('portal-color-2').value = currentConfig.portalColor2 || '#7c5cd6';
+        if (el('portal-color-3')) el('portal-color-3').value = currentConfig.portalColor3 || '#a78bfa';
+        if (el('portal-color-4')) el('portal-color-4').value = currentConfig.portalColor4 || '#c4b5fd';
+        if (el('portal-opacity')) {
+            el('portal-opacity').value = currentConfig.portalOpacity ?? 100;
+            el('portal-opacity-val').innerText = el('portal-opacity').value + '%';
+        }
+        if (el('portal-thickness')) {
+            el('portal-thickness').value = currentConfig.portalThickness ?? 2;
+            el('portal-thickness-val').innerText = el('portal-thickness').value + 'px';
+        }
+        if (el('portal-filled')) el('portal-filled').checked = currentConfig.portalFilled ?? false;
+        if (el('closed-color')) el('closed-color').value = currentConfig.closedPortalColor || '#73737f';
+        if (el('closed-filled')) el('closed-filled').checked = currentConfig.closedPortalFilled ?? false;
+        if (el('connector-color')) el('connector-color').value = currentConfig.connectorColor || '#a78bfa';
+        if (el('connector-opacity')) el('connector-opacity').value = currentConfig.connectorOpacity ?? 100;
+        if (el('connector-thickness')) el('connector-thickness').value = currentConfig.connectorThickness ?? 3;
+        if (el('portal-show-number')) el('portal-show-number').checked = currentConfig.portalShowNumber ?? true;
+        if (el('portal-number-color')) el('portal-number-color').value = currentConfig.portalNumberColor || '#ffffff';
+        if (el('portal-number-ox')) el('portal-number-ox').value = currentConfig.portalNumberOffsetX ?? 0;
+        if (el('portal-number-oy')) el('portal-number-oy').value = currentConfig.portalNumberOffsetY ?? 0;
+        if (el('portal-number-scale')) {
+            el('portal-number-scale').value = currentConfig.portalNumberScale ?? 100;
+            el('portal-number-scale-val').innerText = el('portal-number-scale').value + '%';
+        }
+        if (currentConfig.portalNumberShape) {
+            document.querySelectorAll('#portal-shape-segment .segment').forEach(s =>
+                s.classList.toggle('active', s.dataset.val === currentConfig.portalNumberShape));
+        }
+        if (el('portal-grey-deleted')) el('portal-grey-deleted').checked = currentConfig.portalGreyDeleted ?? false;
+        if (el('portal-show-distance')) el('portal-show-distance').checked = currentConfig.portalShowDistance ?? false;
+        if (el('damage-show')) el('damage-show').checked = currentConfig.damageShow ?? true;
+        if (el('damage-color')) el('damage-color').value = currentConfig.damageColor || '#0e7490';
+        if (el('damage-thickness')) el('damage-thickness').value = currentConfig.damageThickness ?? 6;
+        if (el('damage-scale')) {
+            el('damage-scale').value = currentConfig.damageScale ?? 100;
+            el('damage-scale-val').innerText = el('damage-scale').value + '%';
+        }
+        if (el('damage-outline')) el('damage-outline').checked = currentConfig.damageOutline ?? true;
+        if (el('damage-outline-color')) el('damage-outline-color').value = currentConfig.damageOutlineColor || '#000000';
+        if (el('damage-outline-thickness')) el('damage-outline-thickness').value = currentConfig.damageOutlineThickness ?? 2;
+        if (el('poll-slider')) {
+            el('poll-slider').value = currentConfig.memoryPollRate ?? 250;
+            el('poll-val').innerText = el('poll-slider').value + 'ms';
+        }
+        if (el('entrance-thickness')) el('entrance-thickness').value = currentConfig.entranceThickness ?? 2;
+        if (el('entrance-opacity')) el('entrance-opacity').value = currentConfig.entranceOpacity ?? 50;
+        if (el('entrance-color')) el('entrance-color').value = currentConfig.entranceColor || '#fbbf24';
+        if (el('entrance-filled')) el('entrance-filled').checked = currentConfig.entranceFilled ?? true;
         
         if (el('statusDot')) {
             el('statusDot').style.background = state.isInGame ? '#23a559' : '#ef4444';
@@ -305,3 +385,37 @@ if (exitBtn) {
         }
     });
 }
+
+(function setupTooltips() {
+    const tip = el('ui-tooltip');
+    if (!tip) return;
+    let current = null;
+
+    const place = host => {
+        const r = host.getBoundingClientRect();
+        let x = r.left + r.width / 2;
+        const half = tip.offsetWidth / 2;
+        x = Math.max(half + 4, Math.min(window.innerWidth - half - 4, x));
+        tip.style.left = x + 'px';
+        tip.style.top = r.top + 'px';
+    };
+
+    document.addEventListener('mouseover', e => {
+        const host = e.target.closest('[data-tip]');
+        if (!host || host === current) return;
+        current = host;
+        tip.textContent = host.getAttribute('data-tip');
+        tip.classList.add('show');
+        place(host);
+    });
+
+    document.addEventListener('mouseout', e => {
+        const host = e.target.closest('[data-tip]');
+        if (!host) return;
+        if (e.relatedTarget && host.contains(e.relatedTarget)) return;
+        current = null;
+        tip.classList.remove('show');
+    });
+})();
+
+applyI18n('en');

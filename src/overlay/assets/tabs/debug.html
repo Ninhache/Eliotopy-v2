@@ -1,94 +1,94 @@
 <div class="card">
-    <div class="card-title">CONSOLE</div>
+    <div class="card-title" data-i18n="card.console">CONSOLE</div>
     <div class="stat-row">
-        <span class="stat-label">Show console</span>
-        <label class="switch">
+        <span class="stat-label" data-i18n="debug.console" data-i18n-tip="debug.console.tip">Show console</span>
+        <label class="switch" data-i18n-tip="debug.console.tip">
             <input type="checkbox" id="toggle-console" onchange="toggleConsole(this.checked)">
             <span class="slider"></span>
         </label>
     </div>
     <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">Logger</span>
+        <span class="stat-label" data-i18n="debug.logger" data-i18n-tip="debug.logger.tip">Logger</span>
         <div class="segmented-control" id="logger-segment">
-            <div class="segment" data-val="debug">Debug</div>
-            <div class="segment active" data-val="info">Info</div>
-            <div class="segment" data-val="warn">Warn</div>
-            <div class="segment" data-val="error">Error</div>
+            <div class="segment" data-val="debug" data-i18n="debug.seg.debug">Debug</div>
+            <div class="segment active" data-val="info" data-i18n="debug.seg.info">Info</div>
+            <div class="segment" data-val="warn" data-i18n="debug.seg.warn">Warn</div>
+            <div class="segment" data-val="error" data-i18n="debug.seg.error">Error</div>
         </div>
     </div>
     <div class="stat-row" style="margin-top: 5px;">
-        <span class="stat-label">Memory poll rate</span>
+        <span class="stat-label" data-i18n="debug.pollrate" data-i18n-tip="debug.pollrate.tip">Memory poll rate</span>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="range" id="poll-slider" min="10" max="2000" value="250" oninput="document.getElementById('poll-val').innerText = this.value + 'ms'; setPollRate(this.value)" style="width: 80px; accent-color: #5b21b6; cursor: pointer;">
+            <input type="range" id="poll-slider" data-i18n-tip="debug.pollrate.tip" min="10" max="2000" value="250" oninput="document.getElementById('poll-val').innerText = this.value + 'ms'; setPollRate(this.value)" style="width: 80px; accent-color: #5b21b6; cursor: pointer;">
             <span class="stat-value" id="poll-val" style="width: 45px; text-align: right;">250ms</span>
         </div>
     </div>
 </div>
 
 <div class="card" id="card-player" style="display: none;">
-    <div class="card-title">PLAYER</div>
+    <div class="card-title" data-i18n="card.player">PLAYER</div>
     <div class="stat-row">
-        <span class="stat-label">Name</span>
+        <span class="stat-label" data-i18n="debug.name">Name</span>
         <span class="stat-value" id="val-player-name">?</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">ID</span>
+        <span class="stat-label" data-i18n="debug.id">ID</span>
         <span class="stat-value" id="val-player-id" style="font-size:11px;">0</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">HP</span>
+        <span class="stat-label" data-i18n="debug.hp">HP</span>
         <span class="stat-value hp" id="val-player-hp">0 / 0 (0%)</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">AP / MP</span>
+        <span class="stat-label" data-i18n="debug.apmp">AP / MP</span>
         <span class="stat-value" id="val-player-apmp">0 / 0</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">Shield</span>
+        <span class="stat-label" data-i18n="debug.shield">Shield</span>
         <span class="stat-value" id="val-player-shield">0</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">Cell</span>
+        <span class="stat-label" data-i18n="debug.cell">Cell</span>
         <span class="stat-value" id="val-player-cell">0</span>
     </div>
 </div>
 
 <div class="card" id="card-map" style="display: none;">
-    <div class="card-title">MAP</div>
+    <div class="card-title" data-i18n="card.map">MAP</div>
     <div class="stat-row">
-        <span class="stat-label">Map ID</span>
+        <span class="stat-label" data-i18n="debug.mapid">Map ID</span>
         <span class="stat-value" id="val-map-id">?</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">Name ID</span>
+        <span class="stat-label" data-i18n="debug.nameid">Name ID</span>
         <span class="stat-value" id="val-map-nameid">?</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">SubArea ID</span>
+        <span class="stat-label" data-i18n="debug.subareaid">SubArea ID</span>
         <span class="stat-value" id="val-map-subareaid">?</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">WorldMap</span>
+        <span class="stat-label" data-i18n="debug.worldmap">WorldMap</span>
         <span class="stat-value" id="val-map-worldmap">?</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">Coordinates</span>
+        <span class="stat-label" data-i18n="debug.coordinates">Coordinates</span>
         <span class="stat-value" id="val-map-pos">0, 0</span>
     </div>
 </div>
 
 <div class="card" id="card-combat" style="display: none;">
-    <div class="card-title">COMBAT</div>
+    <div class="card-title" data-i18n="card.combat">COMBAT</div>
     <div class="stat-row">
-        <span class="stat-label">In combat</span>
+        <span class="stat-label" data-i18n="debug.incombat">In combat</span>
         <span class="stat-value active">YES</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">My turn</span>
+        <span class="stat-label" data-i18n="debug.myturn">My turn</span>
         <span class="stat-value" id="val-combat-turn">NO</span>
     </div>
     <div class="stat-row">
-        <span class="stat-label">Turn of (ID)</span>
+        <span class="stat-label" data-i18n="debug.turnof">Turn of (ID)</span>
         <span class="stat-value" id="val-combat-turn-id">?</span>
     </div>
 </div>
@@ -101,7 +101,7 @@
 </div>
 
 <div class="card" id="card-portals" style="display: none;">
-    <div class="card-title">PORTALS</div>
+    <div class="card-title" data-i18n="card.portals">PORTALS</div>
     <div class="portal-grid" id="list-portals">
         <!-- Injected via JS -->
     </div>

@@ -24,29 +24,34 @@
     </div>
     <div id="content">
         <div class="tabs">
-            <div class="tab active" data-target="settings">SETTINGS</div>
-            <div class="tab" data-target="overlay">OVERLAY</div>
-            <div class="tab" data-target="debug">DEBUG</div>
+            <div class="tab active" data-target="settings" data-i18n="tab.keybinds">KEYBINDS</div>
+            <div class="tab" data-target="overlay" data-i18n="tab.overlay">OVERLAY</div>
+            <div class="tab" data-target="debug" data-i18n="tab.debug">DEBUG</div>
         </div>
         
-        <div id="view-settings" class="tab-content active">
-            <!-- INJECT_SETTINGS -->
-        </div>
+        <div id="tab-scroll">
+            <div id="view-settings" class="tab-content active">
+                <!-- INJECT_SETTINGS -->
+            </div>
 
-        <div id="view-overlay" class="tab-content">
-            <!-- INJECT_OVERLAY -->
-        </div>
-        
-        <div id="view-debug" class="tab-content">
-            <!-- INJECT_DEBUG -->
+            <div id="view-overlay" class="tab-content">
+                <!-- INJECT_OVERLAY -->
+            </div>
+
+            <div id="view-debug" class="tab-content">
+                <!-- INJECT_DEBUG -->
+            </div>
         </div>
     </div>
     <button id="exit-btn" class="exit-btn">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-        Exit Eliotopy
+        <span data-i18n="app.exit">Exit Eliotopy</span>
     </button>
 </div>
 
+<div id="ui-tooltip"></div>
+
+<script src="i18n.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

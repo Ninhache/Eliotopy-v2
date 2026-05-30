@@ -8,6 +8,7 @@
 #include "Resolve6.hpp"
 #include "DataStore.h"
 #include "Keybind.h"
+#include "features/PortalPlanner.h"
 #include "shared/Config.h"
 #include "overlay/Renderer.h"
 #include "overlay/WebViewPanel.h"
@@ -25,6 +26,7 @@ public:
 
     void init() {
         ConfigManager::get().load();
+        g_memoryPollRate = ConfigManager::get().state.memoryPollRate;
 
         Logger::info("Searching for Dofus.exe");
         _gamePid = ProcessHelper::getProcessId("Dofus.exe");
@@ -105,6 +107,22 @@ private:
         registry.registerHoldAction("los_assist", "LOS Assist", Keybind{},
             [] { g_losAssistActive = true; },
             [] { g_losAssistActive = false; });
+
+        registry.registerHoldAction("portal_preview", "Preview Exit", Keybind{},
+            [] { g_portalPreviewActive = true; },
+            [] { g_portalPreviewActive = false; });
+        registry.registerAction("portal_entrance", "Preview Entrance", Keybind{}, [] {
+            int hovered = PortalPlanner::get().hoveredCell();
+            if (PortalPlanner::get().isNetworkCell(hovered))
+                g_portalEntranceTarget = (g_portalEntranceTarget.load() == hovered) ? -1 : hovered;
+            else
+                g_portalEntranceTarget = -1;
+        });
+        registry.registerAction("portal_place", "Place Portal", Keybind{}, [] { PortalPlanner::get().place(); });
+        registry.registerAction("portal_clear", "Clear Portals", Keybind{}, [] { PortalPlanner::get().clear(); });
+        registry.registerHoldAction("distance_measure", "Measure Distance", Keybind{},
+            [] { g_distanceAnchorCell = PortalPlanner::get().hoveredCell(); g_distanceMeasureActive = true; },
+            [] { g_distanceMeasureActive = false; });
 
         registry.loadFromConfig();
     }

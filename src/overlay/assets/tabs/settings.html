@@ -1,16 +1,50 @@
 <div class="card">
-    <div class="card-title">MISC</div>
+    <div class="card-title" data-i18n="card.portals">PORTALS</div>
     <div class="kb-row">
-        <span class="stat-label">LOS Assist</span>
+        <span class="stat-label" data-i18n="kb.portal_preview" data-i18n-tip="kb.portal_preview.tip">Preview Exit</span>
+        <div class="kb-controls" id="kb-ctrl-portal_preview"></div>
+    </div>
+    <div class="kb-row">
+        <span class="stat-label" data-i18n="kb.portal_entrance" data-i18n-tip="kb.portal_entrance.tip">Preview Entrance</span>
+        <div class="kb-controls" id="kb-ctrl-portal_entrance"></div>
+    </div>
+    <div class="kb-row">
+        <span class="stat-label" data-i18n="kb.portal_place" data-i18n-tip="kb.portal_place.tip">Place Portal</span>
+        <div class="kb-controls" id="kb-ctrl-portal_place"></div>
+    </div>
+    <div class="kb-row">
+        <span class="stat-label" data-i18n="kb.portal_clear" data-i18n-tip="kb.portal_clear.tip">Clear Portals</span>
+        <div class="kb-controls" id="kb-ctrl-portal_clear"></div>
+    </div>
+    <div class="kb-hint" data-i18n="kb.hint">Click a binding to set a new shortcut. Esc cancels.</div>
+</div>
+
+<div class="card">
+    <div class="card-title" data-i18n="card.misc">MISC</div>
+    <div class="kb-row">
+        <span class="stat-label" data-i18n="kb.los_assist" data-i18n-tip="kb.los_assist.tip">LOS Assist</span>
         <div class="kb-controls" id="kb-ctrl-los_assist"></div>
     </div>
     <div class="kb-row">
-        <span class="stat-label">Toggle Grid</span>
+        <span class="stat-label" data-i18n="kb.distance_measure" data-i18n-tip="kb.distance_measure.tip">Measure Distance</span>
+        <div class="kb-controls" id="kb-ctrl-distance_measure"></div>
+    </div>
+    <div class="kb-row">
+        <span class="stat-label" data-i18n="kb.toggle_grid" data-i18n-tip="kb.toggle_grid.tip">Toggle Grid</span>
         <div class="kb-controls" id="kb-ctrl-toggle_grid"></div>
     </div>
     <div class="kb-row">
-        <span class="stat-label">Toggle Menu</span>
+        <span class="stat-label" data-i18n="kb.toggle_menu" data-i18n-tip="kb.toggle_menu.tip">Toggle Menu</span>
         <div class="kb-controls" id="kb-ctrl-toggle_menu"></div>
     </div>
-    <div class="kb-hint">Click a binding to set a new shortcut. Esc cancels.</div>
+    <div class="kb-row">
+        <span class="stat-label" data-i18n="misc.language" data-i18n-tip="misc.language.tip">Language</span>
+        <div class="segmented-control" id="lang-segment">
+            <div class="segment" data-val="en">EN</div>
+            <div class="segment" data-val="fr">FR</div>
+            <div class="segment" data-val="es">ES</div>
+            <div class="segment" data-val="de">DE</div>
+            <div class="segment" data-val="pt">PT</div>
+        </div>
+    </div>
 </div>

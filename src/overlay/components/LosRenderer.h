@@ -10,13 +10,14 @@ public:
         bool active = g_losAssistActive.load();
         int hovered = -1;
 
-        if (active && ctx.valid && !state.cells.empty()) {
-            const Cell* cell = findHovered(ctx, state);
-            if (cell) {
-                bool walkable = state.isInFight ? (cell->mov && !cell->nonWalkableDuringFight)
-                                                : (cell->mov && !cell->nonWalkableDuringRP);
+        if (active && ctx.valid && ctx.hoveredCell >= 0 && ctx.cellById) {
+            auto it = ctx.cellById->find(ctx.hoveredCell);
+            if (it != ctx.cellById->end()) {
+                const Cell& cell = *it->second;
+                bool walkable = state.isInFight ? (cell.mov && !cell.nonWalkableDuringFight)
+                                                : (cell.mov && !cell.nonWalkableDuringRP);
                 if (walkable)
-                    hovered = cell->cellNumber;
+                    hovered = ctx.hoveredCell;
             }
         }
 
@@ -64,21 +65,6 @@ public:
     }
 
 private:
-    const Cell* findHovered(const RenderContext& ctx, const GameState& state) const {
-        const Cell* best = nullptr;
-        double bestDist = 1e18;
-        for (const auto& cell : state.cells) {
-            double dx = ctx.cursor.x - ctx.cellX(cell);
-            double dy = ctx.cursor.y - ctx.cellY(cell);
-            double dist = dx * dx + dy * dy;
-            if (dist < bestDist) {
-                bestDist = dist;
-                best = &cell;
-            }
-        }
-        return best;
-    }
-
     std::unordered_set<int> _visible;
     int _hovered = -1;
     bool _active = false;

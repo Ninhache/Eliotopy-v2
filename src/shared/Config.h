@@ -9,8 +9,13 @@
 
 inline std::atomic<int> g_memoryPollRate{250};
 inline std::atomic<bool> g_losAssistActive{false};
+inline std::atomic<bool> g_portalPreviewActive{false};
+inline std::atomic<int> g_portalEntranceTarget{-1};
+inline std::atomic<bool> g_distanceMeasureActive{false};
+inline std::atomic<int> g_distanceAnchorCell{-1};
 
 struct ConfigState {
+    int memoryPollRate = 250;
     bool gridOverlay = false;
     std::string gridColor = "#ffffff";
     int gridOpacity = 100;
@@ -27,6 +32,38 @@ struct ConfigState {
     int losEvenOpacity = 60;
     std::string losOddColor = "#2e2e33";
     int losOddOpacity = 68;
+    std::string portalColor1 = "#5b21b6";
+    std::string portalColor2 = "#7c5cd6";
+    std::string portalColor3 = "#a78bfa";
+    std::string portalColor4 = "#c4b5fd";
+    int portalOpacity = 100;
+    bool portalFilled = false;
+    int portalThickness = 2;
+    std::string closedPortalColor = "#73737f";
+    bool closedPortalFilled = false;
+    bool portalShowNumber = true;
+    std::string portalNumberColor = "#ffffff";
+    std::string portalNumberShape = "round";
+    int portalNumberOffsetX = 0;
+    int portalNumberOffsetY = 0;
+    int portalNumberScale = 100;
+    bool portalGreyDeleted = false;
+    bool portalShowDistance = false;
+    std::string connectorColor = "#a78bfa";
+    int connectorOpacity = 100;
+    int connectorThickness = 3;
+    std::string entranceColor = "#fbbf24";
+    int entranceOpacity = 50;
+    bool entranceFilled = true;
+    int entranceThickness = 2;
+    bool damageShow = true;
+    std::string damageColor = "#0e7490";
+    int damageThickness = 6;
+    int damageScale = 100;
+    bool damageOutline = true;
+    std::string damageOutlineColor = "#000000";
+    int damageOutlineThickness = 2;
+    std::string language = "en";
     int menuX = -1;
     int menuY = -1;
     int collapsedX = -1;
@@ -35,7 +72,7 @@ struct ConfigState {
     int64_t trackedEntityId = 0;
 };
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigState, gridOverlay, gridColor, gridOpacity, gridMode, gridShowLos, gridShowMove, gridFillOpacity, gridFillColor, backgroundOverlay, losShowWalls, losWallColor, losWallOpacity, losEvenColor, losEvenOpacity, losOddColor, losOddOpacity, menuX, menuY, collapsedX, collapsedY, keybinds)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigState, memoryPollRate, gridOverlay, gridColor, gridOpacity, gridMode, gridShowLos, gridShowMove, gridFillOpacity, gridFillColor, backgroundOverlay, losShowWalls, losWallColor, losWallOpacity, losEvenColor, losEvenOpacity, losOddColor, losOddOpacity, portalColor1, portalColor2, portalColor3, portalColor4, portalOpacity, portalFilled, portalThickness, closedPortalColor, closedPortalFilled, portalShowNumber, portalNumberColor, portalNumberShape, portalNumberOffsetX, portalNumberOffsetY, portalNumberScale, portalGreyDeleted, portalShowDistance, connectorColor, connectorOpacity, connectorThickness, entranceColor, entranceOpacity, entranceFilled, entranceThickness, damageShow, damageColor, damageThickness, damageScale, damageOutline, damageOutlineColor, damageOutlineThickness, language, menuX, menuY, collapsedX, collapsedY, keybinds)
 
 class ConfigManager {
 private:

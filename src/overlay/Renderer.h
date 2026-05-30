@@ -1,12 +1,14 @@
 #pragma once
 #include <windows.h>
 #include <d2d1.h>
+#include <dwrite.h>
 #include <wrl/client.h>
 #include <string>
 #include <chrono>
 #include <cstdint>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 #include "datastore/GameState.h"
 #include "Config.h"
 #include "Utils.h"
@@ -14,8 +16,10 @@
 #include "components/BackgroundRenderer.h"
 #include "components/GridRenderer.h"
 #include "components/LosRenderer.h"
+#include "components/PortalRenderer.h"
 
 #pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
 
 class Renderer {
 private:
@@ -31,6 +35,8 @@ private:
     ComPtr<ID2D1DCRenderTarget> _renderTarget;
     ComPtr<ID2D1SolidColorBrush> _brush;
     ComPtr<ID2D1PathGeometry> _unitDiamond;
+    ComPtr<IDWriteFactory> _dwriteFactory;
+    ComPtr<IDWriteTextFormat> _textFormat;
 
     HDC _memDC = nullptr;
     HBITMAP _dibBitmap = nullptr;
@@ -44,6 +50,7 @@ private:
     size_t _lastCellCount = 0;
     uint32_t _lastMapId = 0;
 
+    std::unordered_map<int, const Cell*> _cellById;
     std::vector<std::unique_ptr<IOverlayComponent>> _components;
 
     static LRESULT CALLBACK windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -81,6 +88,30 @@ private:
         return true;
     }
 
+    void buildCellMap(const GameState& state) {
+        _cellById.clear();
+        _cellById.reserve(state.cells.size() * 2);
+        for (const auto& cell : state.cells)
+            _cellById[cell.cellNumber] = &cell;
+    }
+
+    int nearestCell(const GameState& state, const RenderContext& ctx) const {
+        if (!ctx.valid || state.cells.empty())
+            return -1;
+        int best = -1;
+        double bestDist = 1e18;
+        for (const auto& cell : state.cells) {
+            double dx = ctx.cursor.x - ctx.cellX(cell);
+            double dy = ctx.cursor.y - ctx.cellY(cell);
+            double dist = dx * dx + dy * dy;
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = cell.cellNumber;
+            }
+        }
+        return best;
+    }
+
     bool createGraphics() {
         if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, _d2dFactory.GetAddressOf())))
             return false;
@@ -88,7 +119,25 @@ private:
         if (!createRenderTarget())
             return false;
 
-        return createUnitDiamond();
+        if (!createUnitDiamond())
+            return false;
+
+        return createTextFormat();
+    }
+
+    bool createTextFormat() {
+        if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                                       reinterpret_cast<IUnknown**>(_dwriteFactory.GetAddressOf()))))
+            return false;
+
+        if (FAILED(_dwriteFactory->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_BOLD,
+                                                    DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+                                                    14.0f, L"en-us", _textFormat.GetAddressOf())))
+            return false;
+
+        _textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+        _textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        return true;
     }
 
     bool createRenderTarget() {
@@ -229,6 +278,7 @@ public:
 
         _components.push_back(std::make_unique<BackgroundRenderer>());
         _components.push_back(std::make_unique<GridRenderer>());
+        _components.push_back(std::make_unique<PortalRenderer>());
         _components.push_back(std::make_unique<LosRenderer>());
 
         ShowWindow(_overlayHwnd, SW_SHOWNA);
@@ -273,8 +323,15 @@ public:
         ctx.width = winWidth;
         ctx.height = winHeight;
         ctx.valid = computeBasis(state.viewProjMatrix, winWidth, winHeight, ctx.origin, ctx.scaleX, ctx.scaleY);
+        ctx.factory = _d2dFactory.Get();
+        ctx.dwrite = _dwriteFactory.Get();
+        ctx.textFormat = _textFormat.Get();
         GetCursorPos(&ctx.cursor);
         ScreenToClient(_targetHwnd, &ctx.cursor);
+
+        buildCellMap(state);
+        ctx.cellById = &_cellById;
+        ctx.hoveredCell = nearestCell(state, ctx);
 
         bool rectChanged = (rect.left != _lastRect.left || rect.top != _lastRect.top ||
                             rect.right != _lastRect.right || rect.bottom != _lastRect.bottom);
