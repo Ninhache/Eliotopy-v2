@@ -18,37 +18,41 @@
 
 ## Overview
 
-Eliotopy is an overlay for Dofus aimed at Eliotrope players: it helps you manage your portal network, compute distances and plan redirections, with a line-of-sight assist on top.
+Eliotopy is a tactical overlay for Dofus, built for Eliotrope players. It helps manage the portal network, measure distances, plan redirections and check line of sight.
 
-It's a full rewrite of the original [Eliotopy](https://github.com/Romain-P/Eliotopy). The first version relied on screen capture and OCR, which was slow and never fully reliable, so I scrapped that and read the game memory directly instead. The data is now exact and instant: full map layout, line of sight, walkable cells, entities and portals.
+It is a full rewrite of the original [Eliotopy](https://github.com/Romain-P/Eliotopy). The first version relied on screen capture and OCR, which was slow and unreliable. This version reads the game memory directly, so the data is exact and instant: map layout, line of sight, walkable cells, entities and portals.
 
 ## Download
 
 - **Stable**: grab the latest [release](https://github.com/Romain-P/Eliotopy-v2/releases/latest).
 - **Nightly**: latest build from `master`, [Eliotopy.exe](https://nightly.link/Romain-P/Eliotopy-v2/workflows/build/master/Eliotopy.zip).
 
-Nightly builds run on every push to `master`. They're not releases: they follow the current work in progress, so expect them to be unstable or sometimes broken. If you want something solid, take a release.
+> [!NOTE]
+> Nightly builds run on every push to `master`. They track work in progress and can be unstable or broken. For a stable build, use a release.
 
-> **⚠️ Important: antivirus false positive.** Your antivirus may flag Eliotopy v2 as a virus. It reads the game's memory and intercepts keyboard keys, which heuristics often mistake for a potential keylogger. This is a false positive: Eliotopy is open-source and you can easily check for malicious behaviors. If you want to use it, **whitelist the process in your antivirus**, or **temporarily disable your antivirus**. Builds are compiled automatically by the CI, but if you have any doubt, the full source code is accessible, so you can also build it yourself instead of trusting the prebuilt binary
+> [!IMPORTANT]
+> **Antivirus false positive.** Your antivirus may flag Eliotopy as a virus. It reads the game's memory and intercepts keyboard input, which heuristics can mistake for a keylogger. This is a false positive: the project is open-source, so its behavior can be verified. To use it, **whitelist the process** in your antivirus or **temporarily disable real-time protection**. Builds are produced automatically by the CI; if in doubt, build from source instead of using the prebuilt binary.
 
 ## Features
 
-- **Fully external.** No DLL injection, no hooks inside the game, nothing written to its process. Eliotopy only reads memory and never sends any input.
-- **Live game state.** Map grid, movement and line-of-sight flags, entities, portals and player stats, straight from the Unity / IL2CPP runtime.
-- **Portal network and redirection.** Follows your real Eliotrope portals from memory, or plan your own by hand with binds using the in-game logic (four max, the oldest drops when you place a fifth). *Preview Exit* (hold) simulates dropping a portal on the cell under your cursor and draws where the redirection comes out, with the damage bonus in percent. *Preview Entrance* (toggle) does the opposite: pick an exit portal and every cell you could enter from to come out there lights up.
-- **Portal numbers.** Drawn over the game's own number so you can actually read them, with a configurable shape (round, square, diamond), color, size and offset.
-- **LOS assist.** Hold a key and it shows the line of sight from the cell under your cursor, using the same algorithm as the game. Obstacles and cells you can't see get a grey checkerboard.
-- **Distance measure.** Hold a key to pin the cell under your cursor, then read the distance to wherever you hover.
-- **Direct2D overlay.** Drawn on top of the game and split into small components (grid, dark filter, portals, LOS).
-- **Control panel.** A draggable panel that snaps to the screen edges. It shows live state and lets you style every feature (colors, opacity, fill, thickness, ...) and rebind every action, each control with its own tooltip.
-- **Multi-language.** English, French, Spanish, German and Portuguese, switchable on the fly.
-- **Keybinds.** Bind any combo of modifiers plus a key, a mouse button or the wheel, including hold and toggle actions. Bound inputs are caught and never reach the game.
+| Feature | Description |
+| :-- | :-- |
+| **Fully external** | No DLL injection, no hooks inside the game, nothing written to its process. Eliotopy only reads memory and never sends any input. |
+| **Live game state** | Map grid, movement and line-of-sight flags, entities, portals and player stats, straight from the Unity / IL2CPP runtime. |
+| **Portal network & redirection** | Follows your real Eliotrope portals from memory, or plan your own by hand (four max, the oldest drops on a fifth). *Preview Exit* (hold) simulates a portal on the hovered cell and draws the redirection with its damage bonus. *Preview Entrance* (toggle) lights up every cell you could enter from to come out at a chosen exit. |
+| **Portal numbers** | Drawn over the game's own number for readability, with a configurable shape (round, square, diamond), color, size and offset. |
+| **LOS assist** | Hold a key to show the line of sight from the hovered cell, using the game's own algorithm. Obstacles and unseen cells get a grey checkerboard. |
+| **Distance measure** | Hold a key to pin the cell under your cursor, then read the distance to wherever you hover. |
+| **Direct2D overlay** | Drawn on top of the game and split into small components (grid, dark filter, portals, LOS). |
+| **Control panel** | A draggable panel that snaps to the screen edges. Style every feature (colors, opacity, fill, thickness) and rebind every action, each control with its own tooltip. |
+| **Multi-language** | English, French, Spanish, German and Portuguese, switchable on the fly. |
+| **Keybinds** | Bind any combo of modifiers plus a key, a mouse button or the wheel, hold or toggle. Bound inputs are caught and never reach the game. |
 
 ## Approach: MITM vs memory reading
 
-MITM works, but Dofus changes its protocol obfuscation almost every patch. IL2CPP offsets barely move between updates, so reading memory is just more reliable in the long run.
+MITM works, but Dofus changes its protocol obfuscation almost every patch. IL2CPP offsets barely move between updates, so reading memory is more reliable over the long run.
 
-And to keep accounts safe, everything stays external: no code injected, nothing written to the game process, no automated clicks.
+Everything stays external to keep accounts safe: no injected code, nothing written to the game process, no automated input.
 
 ## Structure
 
@@ -74,20 +78,20 @@ src/
 
 ## Build
 
-You'll need Windows 10/11, Visual Studio 2022 and CMake 3.29+. Everything else (WebView2 SDK, glm, er6) already lives in `libs/`.
+Requires Windows 10/11, Visual Studio 2022 and CMake 3.29+. The remaining dependencies (WebView2 SDK, glm, er6) are vendored in `libs/`.
 
 ```bash
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 cmake --build build --config Release
 ```
 
-You get a standalone `build/Release/Eliotopy.exe` (static CRT, nothing to install).
+The result is a standalone `build/Release/Eliotopy.exe` (static CRT, no runtime to install).
 
 ## Usage
 
 1. Start Dofus.
 2. Run `Eliotopy.exe`.
-3. The overlay attaches to the game window. Open the panel (Settings / Overlay / Debug) to toggle things and set your keybinds.
+3. The overlay attaches to the game window. Open the panel (Keybinds / Overlay / Debug) to configure features and set keybinds.
 
 ## Roadmap
 
@@ -112,4 +116,4 @@ You get a standalone `build/Release/Eliotopy.exe` (static CRT, nothing to instal
 
 ## License
 
-MIT, see [`LICENSE`](LICENSE). It's a read-only external tool meant for personal and educational use. Use at your own risk.
+Released under the MIT license, see [`LICENSE`](LICENSE). Eliotopy is a read-only external tool intended for personal and educational use. Use at your own risk.
