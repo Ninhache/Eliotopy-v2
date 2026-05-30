@@ -4,6 +4,8 @@
 #include "datastore/GameState.h"
 #include <sstream>
 #include <algorithm>
+#include <unordered_set>
+#include <unordered_map>
 #include "types/MapRenderer.h"
 #include "shared/Config.h"
 
@@ -14,6 +16,47 @@ private:
     uint32_t _lastMapId = 0;
     bool _lastIsInFight = false;
     int _cellRefreshRetries = 0;
+
+    bool _lastPlayerTurn = false;
+    std::unordered_map<int64_t, bool> _prevPortalOpen;
+    std::unordered_set<int64_t> _usedThisTurn;
+
+    void resolvePortalStates() {
+        bool myTurn = states.isInFight && states.isPlayerTurn;
+        if (myTurn != _lastPlayerTurn)
+            _usedThisTurn.clear();
+        _lastPlayerTurn = myTurn;
+
+        std::unordered_set<int32_t> occupiedCells;
+        for (const auto& [id, entity] : states.fightEntities) occupiedCells.insert(entity.cellId);
+
+        std::unordered_map<int64_t, bool> currentRawOpen;
+        currentRawOpen.reserve(states.portalEntities.size());
+
+        for (auto& [id, portal] : states.portalEntities) {
+            bool rawOpen = portal.isOpen;
+            bool entityOnTop = occupiedCells.count(portal.cellId) > 0;
+
+            if (myTurn) {
+                auto prev = _prevPortalOpen.find(id);
+                bool wasOpen = (prev != _prevPortalOpen.end()) && prev->second;
+                if (wasOpen && !rawOpen && !entityOnTop)
+                    _usedThisTurn.insert(id);
+            }
+            currentRawOpen[id] = rawOpen;
+
+            if (rawOpen)
+                portal.closedReason = PortalClosedReason::None;
+            else if (entityOnTop)
+                portal.closedReason = PortalClosedReason::EntityOnTop;
+            else if (myTurn && _usedThisTurn.count(id) > 0)
+                portal.closedReason = PortalClosedReason::ClosedOrUsed;
+            else
+                portal.closedReason = PortalClosedReason::None;
+        }
+
+        _prevPortalOpen = std::move(currentRawOpen);
+    }
 
 public:
     GameState states;
@@ -175,7 +218,7 @@ public:
                 if (it != teamsMap.end()) {
                     entityState.teamId = it->second;
                 }
-                if (entityState.type != EntityType::Portal) {
+                if (static_cast<int32_t>(entityState.type) > 500) {
                     states.fightEntities[id] = std::move(entityState);
                 }
             } else {
@@ -215,6 +258,8 @@ public:
                 sortedPortals[i]->index = static_cast<int32_t>(i + 1);
             }
         }
+
+        resolvePortalStates();
 
         if (ConfigManager::get().state.trackedEntityId != 0) {
             int64_t tracked = ConfigManager::get().state.trackedEntityId;

@@ -154,7 +154,7 @@ private:
                         std::to_string(c.damageThickness) + std::to_string(c.damageScale) +
                         (c.damageOutline ? "O" : "") + c.damageOutlineColor + std::to_string(c.damageOutlineThickness) + "|";
         for (const auto& [id, portal] : state.portalEntities)
-            s += std::to_string(portal.cellId) + (portal.isOpen ? "o" : "c") + ";";
+            s += std::to_string(portal.cellId) + (portal.effectiveOpen() ? "o" : "c") + ";";
         for (const auto& manual : PortalPlanner::get().manualPortals())
             s += "m" + std::to_string(manual.cellId) + (manual.open ? "o" : "c") + ";";
         for (int cellId : PortalPlanner::get().removedPortals())
@@ -172,7 +172,7 @@ private:
         std::vector<std::pair<int, bool>> out;
         out.reserve(memory.size());
         for (const PortalState* portal : memory)
-            out.push_back({ portal->cellId, portal->isOpen });
+            out.push_back({ portal->cellId, portal->effectiveOpen() });
         return out;
     }
 

@@ -204,11 +204,14 @@ function updateDebugView(state) {
         let html = '';
         for (const p of state.portals) {
             let trackClass = (p.id === state.trackedEntityId) ? 'border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1);' : '';
+            let reason = p.closedReason || 0;
+            let open = reason === 0;
+            let label = open ? 'OPEN' : (reason === 1 ? 'CLOSED (entity)' : 'CLOSED (used)');
             html += `<div class="portal-item" style="cursor: pointer; ${trackClass}" onclick="window.chrome.webview.postMessage('track:${p.id}')">
                 <span class="portal-index">#${p.index}</span>
                 <span style="font-size:10px; color:#80848e;">ID: ${p.id}</span>
                 <span class="portal-cell">Cell ${p.cellId}</span>
-                <span class="${p.isOpen ? 'portal-open' : 'portal-closed'}">${p.isOpen ? 'OPEN' : 'CLOSED'}</span>
+                <span class="${open ? 'portal-open' : 'portal-closed'}">${label}</span>
             </div>`;
         }
         el('list-portals').innerHTML = html;
