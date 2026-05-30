@@ -33,6 +33,15 @@ It is a full rewrite of the original [Eliotopy](https://github.com/Romain-P/Elio
 > [!IMPORTANT]
 > **Antivirus false positive.** Your antivirus may flag Eliotopy as a virus. It reads the game's memory and intercepts keyboard input, which heuristics can mistake for a keylogger. This is a false positive: the project is open-source, so its behavior can be verified. To use it, **whitelist the process** in your antivirus or **temporarily disable real-time protection**. Builds are produced automatically by the CI; if in doubt, build from source instead of using the prebuilt binary.
 
+## Safety / Bans
+
+Eliotopy is meant to make the game more enjoyable for players who would rather think a little less. It works like [Insightroom](https://www.dofusroom.com/insightroom), except it draws directly on top of the game in real time. It will **never** act like a bot and will **never** automate any action.
+
+If the tool is still considered abusive, keep in mind that Eliotopy is fully external: it only reads memory and injects nothing into the game. Its windows, handles and executable name are randomized, which makes it hard to detect in the first place.
+
+> [!CAUTION]
+> Zero risk does not exist, use it at your own risk. This project is personal and educational at heart, and I am not responsible for what you do with it.
+
 ## Features
 
 | Feature | Description |
