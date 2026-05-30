@@ -118,11 +118,11 @@ The result is a standalone `build/Release/Eliotopy.exe` (static CRT, no runtime 
 - [x] Multi-language UI (EN / FR / ES / DE / PT)
 - [x] Automatic in-app updater
 - [x] Randomized process name so Eliotopy doesn't stand out in the Windows process list
-- [ ] Factor entities into line-of-sight calculations
+- [x] Smarter portal state: a portal is closed only when no entity stands on it, or when closed manually during player turn
+- [x] Factor entities into line-of-sight calculations
 - [ ] AI turn assist to land a hit on a target through portals
 - [ ] Lua engine with a rich API to write scripts and build AIs
 - [ ] Scripts to assist on mechanically hard bosses
-- [ ] Smarter portal state: a portal is closed only when no entity stands on it, or when closed manually
 
 ## License
 
