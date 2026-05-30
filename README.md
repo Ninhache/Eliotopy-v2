@@ -74,6 +74,7 @@ src/
 ├─ types/                Dofus structures (cells, entities, services, ...)
 ├─ datastore/            plain state structs (GameState, MapState, ...)
 ├─ features/             feature logic (LineOfSight, RedirectionHelper, PortalPlanner)
+├─ utilities/            self-update, single-instance guard and stealth process name (Updater, SingleInstance, StealthName)
 └─ overlay/
    ├─ Renderer.h         Direct2D device + window orchestrator
    ├─ WebViewPanel.h     control panel
