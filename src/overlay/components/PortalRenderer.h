@@ -50,6 +50,10 @@ public:
         std::vector<Portal> display = network;
         std::vector<Portal> path;
 
+        std::unordered_set<int> realCells;
+        for (const auto& [id, portal] : state.portalEntities)
+            realCells.insert(portal.cellId);
+
         int entranceTarget = g_portalEntranceTarget.load();
         bool hoveredWalkable = isWalkable(state, *ctx.cellById, ctx.hoveredCell);
         bool hoveredIsPortal = false;
@@ -57,10 +61,10 @@ public:
             if (portal.cellId == ctx.hoveredCell) { hoveredIsPortal = true; break; }
 
         if (g_portalPreviewActive.load() && hoveredWalkable) {
-            path = buildPreview(ctx.hoveredCell, network, display, config);
+            path = buildPreview(ctx.hoveredCell, network, display, config, realCells);
         } else if (entranceTarget >= 0 && hoveredWalkable && !hoveredIsPortal) {
             std::vector<Portal> sim = network;
-            std::vector<Portal> simPath = buildPreview(ctx.hoveredCell, network, sim, config);
+            std::vector<Portal> simPath = buildPreview(ctx.hoveredCell, network, sim, config, realCells);
             if (!simPath.empty() && simPath.back().cellId == entranceTarget) {
                 display = sim;
                 path = simPath;
@@ -68,7 +72,7 @@ public:
         }
 
         if (config.portalGreyDeleted)
-            appendGhosts(ctx, display);
+            appendGhosts(ctx, display, realCells);
 
         if (entranceTarget >= 0)
             drawEntranceCandidates(ctx, state, network, entranceTarget, config);
@@ -205,7 +209,7 @@ private:
         return network;
     }
 
-    std::vector<Portal> buildPreview(int hovered, const std::vector<Portal>& network, std::vector<Portal>& display, const ConfigState& config) {
+    std::vector<Portal> buildPreview(int hovered, const std::vector<Portal>& network, std::vector<Portal>& display, const ConfigState& config, const std::unordered_set<int>& realCells) {
         for (const auto& portal : network) {
             if (portal.cellId == hovered) {
                 display = network;
@@ -239,7 +243,7 @@ private:
 
         std::vector<Portal> path = RedirectionHelper::calculatePath(display, entrance);
 
-        if (hasDropped && config.portalGreyDeleted) {
+        if (hasDropped && config.portalGreyDeleted && realCells.count(dropped.cellId) > 0) {
             dropped.ghost = true;
             display.push_back(dropped);
         }
@@ -294,8 +298,10 @@ private:
             ctx.drawTextScaled(std::to_wstring(portal.number), bx, by, radius * 1.2f, number);
     }
 
-    void appendGhosts(const RenderContext& ctx, std::vector<Portal>& display) const {
+    void appendGhosts(const RenderContext& ctx, std::vector<Portal>& display, const std::unordered_set<int>& realCells) const {
         for (int cellId : PortalPlanner::get().removedPortals()) {
+            if (realCells.count(cellId) == 0)
+                continue;
             if (ctx.cellById->find(cellId) == ctx.cellById->end())
                 continue;
             bool already = false;
